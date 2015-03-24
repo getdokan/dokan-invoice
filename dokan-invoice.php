@@ -40,14 +40,6 @@
 if ( !defined( 'ABSPATH' ) )
     exit;
 
-if ( !class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
-            return ;
-        }
-if ( !class_exists( 'WeDevs_Dokan' ) ) {
-            return ;
-        }       
- 
-
 /**
  * Dokan_Invoice class
  *
@@ -76,24 +68,11 @@ class Dokan_Invoice {
         self::$plugin_basename = plugin_basename( __FILE__ );
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
+        
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
         register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-
-        // Localize our plugin
-        add_action( 'init', array( $this, 'localization_setup' ) );
-
-        // Loads frontend scripts and styles
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-        //actions
-        add_action( 'wp_ajax_dokan_get_invoice', array( $this, 'dokan_get_invoice_ajax' ) );
-        add_action( 'wpo_wcpdf_process_template', array( $this, 'dokan_update_template_path' ) );
-
-
-
-        //filters
-        add_filter( 'wpo_wcpdf_listing_actions', array( $this, 'dokan_invoice_listing_actions' ), 10, 2 );
-        add_filter( 'wpo_wcpdf_myaccount_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 10, 2 );
+        
+        add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
 
     /**
@@ -109,6 +88,27 @@ class Dokan_Invoice {
         }
 
         return $instance;
+    }
+    
+    function init_hooks() {
+        
+        if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
+            return ;
+        }
+        
+        // Localize our plugin
+        add_action( 'init', array( $this, 'localization_setup' ) );
+
+        // Loads frontend scripts and styles
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+        //actions
+        add_action( 'wp_ajax_dokan_get_invoice', array( $this, 'dokan_get_invoice_ajax' ) );
+        add_action( 'wpo_wcpdf_process_template', array( $this, 'dokan_update_template_path' ) );
+
+        //filters
+        add_filter( 'wpo_wcpdf_listing_actions', array( $this, 'dokan_invoice_listing_actions' ), 10, 2 );
+        add_filter( 'wpo_wcpdf_myaccount_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 10, 2 );
     }
 
     /**
