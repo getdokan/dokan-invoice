@@ -1,13 +1,8 @@
 <?php
 global $wpo_wcpdf;
 
-$order_id = (int) $wpo_wcpdf->get_invoice_number();
-
+$order_id  = (int) $_GET['order_ids'];
 $seller_id = dokan_get_seller_id_by_order( $order_id );
-
-if ( $seller_id == 0 ) {
-    wp_die( _e( 'Error in Information ', 'dokan-invoice' ) );
-}
 
 $shop_info   = dokan_get_store_info( $seller_id );
 $store_email = '';

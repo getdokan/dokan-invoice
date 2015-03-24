@@ -109,6 +109,7 @@ class Dokan_Invoice {
         //filters
         add_filter( 'wpo_wcpdf_listing_actions', array( $this, 'dokan_invoice_listing_actions' ), 10, 2 );
         add_filter( 'wpo_wcpdf_myaccount_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 10, 2 );
+        add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
     }
 
     /**
@@ -209,7 +210,7 @@ class Dokan_Invoice {
     function dokan_get_invoice_ajax() {
         
         $this->dokan_invoice_active = 1;
-
+        
         // create a wp_invoice_export class object               
         $wp_invoice_exp = new WooCommerce_PDF_Invoices_Export();
 
@@ -224,6 +225,16 @@ class Dokan_Invoice {
 
         // replace default export instant 
         $wpo_wcpdf->export = $wp_invoice_exp;
+        
+         //check order type
+        $order_id  = (int) $_GET['order_ids'];
+        $seller_id = dokan_get_seller_id_by_order( $order_id );
+        
+             
+        if ( $seller_id == 0 ) {
+           $_GET['template_type']='invoice';
+        }
+               
         //generate pdf
         $wp_invoice_exp->generate_pdf_ajax();
     }

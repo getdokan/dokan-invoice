@@ -4,7 +4,6 @@ global $dokan_invoice;
 ?>
 
 <?php
-$order_id = (int) $wpo_wcpdf->get_invoice_number();
 
 $items = $wpo_wcpdf->export->order->get_items();
 //var_dump($items);
