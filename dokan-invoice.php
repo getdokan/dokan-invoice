@@ -176,7 +176,12 @@ class Dokan_Invoice {
      * Hooked with WP_invoice filter
      */
     function dokan_invoice_listing_actions( $listing_actions, $order ) {
+
         //$listing_actions = '';
+        if ( !is_admin() && !isset( $_GET[ 'my_account' ] ) ) {
+            return $listing_actions = array();
+        }
+
         $listing_actions[ 'test' ] = array(
             'url' => wp_nonce_url( admin_url( 'admin-ajax.php?action=dokan_get_invoice&template_type=invoice&order_ids=' . $order->id ), 'dokan_get_invoice' ),
             'img' => WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
