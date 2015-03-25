@@ -178,7 +178,7 @@ class Dokan_Invoice {
     function dokan_invoice_listing_actions( $listing_actions, $order ) {
 
         //$listing_actions = '';
-        if ( !is_admin() && !isset( $_GET[ 'my_account' ] ) ) {
+        if ( !is_admin() && !isset( $_GET['my_account'] ) ) {
             return $listing_actions = array();
         }
 
