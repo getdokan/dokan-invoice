@@ -30,7 +30,9 @@ $store_email = '';
                 <?php
             }
             ?>
-            <div class="shop-address"><?php echo $shop_info[ 'address' ] ?></div>
+            <div class="shop-address">
+                <?php echo dokan_get_seller_address( $seller_id ); ?>
+            </div>
             <?php
             if ( $shop_info[ 'phone' ] != '' || Null ) {
                 $store_email = get_user_meta( $seller_id, 'billing_email' );
@@ -126,7 +128,6 @@ $store_email = '';
                     </tfoot>
                 </table>
             </td>
-
         </tr>
     </tfoot>
 </table><!-- order-details -->
