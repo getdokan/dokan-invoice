@@ -158,7 +158,7 @@ class Dokan_Invoice {
         /**
          * All scripts goes here
          */
-        wp_enqueue_script( 'dokan-invoice-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), false, true );
+        //wp_enqueue_script( 'dokan-invoice-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), false, true );
 
 
         /**
