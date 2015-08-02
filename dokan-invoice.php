@@ -1,18 +1,17 @@
 <?php
-
 /*
-  Plugin Name: Dokan PDF Invoice
-  Plugin URI: http://wedevs.com/
+  Plugin Name: Dokan - PDF Invoice
+  Plugin URI: https://wedevs.com/products/dokan/dokan-pdf-invoice/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 0.1
-  Author: WeDevs
-  Author URI: http://wedevs.com/
+  Version: 1.0
+  Author: weDevs
+  Author URI: https://wedevs.com/
   License: GPL2
   Text Domain: dokan-invoice
  */
 
 /**
- * Copyright (c) YEAR Your Name (email: Email). All rights reserved.
+ * Copyright (c) 2015 weDevs (email: info@wedevs.com). All rights reserved.
  *
  * Released under the GPL license
  * http://www.opensource.org/licenses/gpl-license.php
@@ -41,12 +40,13 @@ if ( !defined( 'ABSPATH' ) )
     exit;
 
 if ( !class_exists( 'WooCommerce_PDF_Invoices_Export' ) ) {
-            return ;
-        }
+    return ;
+}
+
 if ( !class_exists( 'WeDevs_Dokan' ) ) {
-            return ;
-        }       
- 
+    return ;
+}
+
 
 /**
  * Dokan_Invoice class
@@ -76,20 +76,13 @@ class Dokan_Invoice {
         self::$plugin_basename = plugin_basename( __FILE__ );
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
-        register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
         // Localize our plugin
         add_action( 'init', array( $this, 'localization_setup' ) );
 
-        // Loads frontend scripts and styles
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
         //actions
         add_action( 'wp_ajax_dokan_get_invoice', array( $this, 'dokan_get_invoice_ajax' ) );
         add_action( 'wpo_wcpdf_process_template', array( $this, 'dokan_update_template_path' ) );
-
-
 
         //filters
         add_filter( 'wpo_wcpdf_listing_actions', array( $this, 'dokan_invoice_listing_actions' ), 10, 2 );
@@ -104,29 +97,12 @@ class Dokan_Invoice {
      */
     public static function init() {
         static $instance = false;
+
         if ( !$instance ) {
             $instance = new Dokan_Invoice();
         }
 
         return $instance;
-    }
-
-    /**
-     * Placeholder for activation function
-     *
-     * Nothing being called here yet.
-     */
-    public function activate() {
-        
-    }
-
-    /**
-     * Placeholder for deactivation function
-     *
-     * Nothing being called here yet.
-     */
-    public function deactivate() {
-        
     }
 
     /**
@@ -139,39 +115,8 @@ class Dokan_Invoice {
     }
 
     /**
-     * Enqueue admin scripts
-     *
-     * Allows plugin assets to be loaded.
-     *
-     * @uses wp_enqueue_script()
-     * @uses wp_localize_script()
-     * @uses wp_enqueue_style
-     */
-    public function enqueue_scripts() {
-
-        /**
-         * All styles goes here
-         */
-        wp_enqueue_style( 'dokan-invoice-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
-
-        /**
-         * All scripts goes here
-         */
-        wp_enqueue_script( 'dokan-invoice-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), false, true );
-
-
-        /**
-         * Example for setting up text strings from Javascript files for localization
-         *
-         * Uncomment line below and replace with proper localization variables.
-         */
-        // $translation_array = array( 'some_string' => __( 'Some string to translate', 'dokan-invoice' ), 'a_value' => '10' );
-        // wp_localize_script( 'base-plugin-scripts', 'dokan-invoice', $translation_array ) );
-    }
-
-    /**
      * Set Dokan_invoice buttons on Woocommerce Order page
-     * 
+     *
      * Hooked with WP_invoice filter
      */
     function dokan_invoice_listing_actions( $listing_actions, $order ) {
@@ -187,7 +132,7 @@ class Dokan_Invoice {
 
     /**
      * Set Dokan_invoice buttons on My Account page
-     * 
+     *
      * Hooked with WP_invoice filter
      */
     function dokan_invoice_listing_actions_my_account( $actions, $order ) {
@@ -204,13 +149,14 @@ class Dokan_Invoice {
     }
 
     /**
-     * Generate PDF          
+     * Generate PDF
      */
     function dokan_get_invoice_ajax() {
-        
+        global $wpo_wcpdf;
+
         $this->dokan_invoice_active = 1;
 
-        // create a wp_invoice_export class object               
+        // create a wp_invoice_export class object
         $wp_invoice_exp = new WooCommerce_PDF_Invoices_Export();
 
         //change the deafult paths to this plugins path
@@ -220,9 +166,7 @@ class Dokan_Invoice {
         $wp_invoice_exp->template_default_base_uri            = Dokan_Invoice::$plugin_url . 'templates/' . $wp_invoice_exp->template_directory_name . '/';
         $wp_invoice_exp->template_settings[ 'template_path' ] = $wp_invoice_exp->template_default_base_path;
 
-        global $wpo_wcpdf;
-
-        // replace default export instant 
+        // replace default export instant
         $wpo_wcpdf->export = $wp_invoice_exp;
         //generate pdf
         $wp_invoice_exp->generate_pdf_ajax();
