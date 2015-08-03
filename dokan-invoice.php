@@ -4,7 +4,7 @@
   Plugin Name: Dokan PDF Invoice
   Plugin URI: http://wedevs.com/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 0.1
+  Version: 1.0
   Author: WeDevs
   Author URI: http://wedevs.com/
   License: GPL2
@@ -51,7 +51,10 @@ class Dokan_Invoice {
     public static $plugin_path;
     public static $plugin_basename;
     protected $dokan_invoice_active = 0;
-
+    
+    private $depends_on = array();
+    private $dependency_error = array();
+   
     /**
      * Constructor for the Dokan_Invoice class
      *
@@ -70,9 +73,62 @@ class Dokan_Invoice {
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
         
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );        
+        
+        $this->depends_on['dokan'] = array(
+            'name' => 'WeDevs_Dokan',
+            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
+        );
+        
+        $this->depends_on['woocommerce_pdf_invoices'] = array(
+            'name' => 'WooCommerce_PDF_Invoices',
+            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
+        );
+        
+        add_action( 'init', array( $this,'is_dependency_available') );
         
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
+    }
+    
+    /**
+     * check if dependencies installed or not and add error notice
+     * @since 1.0.0
+     */
+    function is_dependency_available(){
+        
+        $res = true;
+        
+        foreach ( $this->depends_on as $class ){
+            if ( !class_exists( $class['name'] ) ){                
+                $this->dependency_error[] = $class['notice'];
+                $res = false;
+            }
+        }
+        
+        if ($res == false){
+            add_action( 'admin_notices', array ( $this, 'dependency_notice' ) );
+        }
+        
+        return $res;
+    }
+    
+    /*
+     * print error notice if dependency not active
+     * @since 1.0.0
+     */
+    function dependency_notice(){
+                
+        $errors = '';
+        $error = '';
+        foreach ( $this->dependency_error as $error ) {
+            $errors .= '<p>' . $error . '</p>';
+        }
+        $message = '<div class="error">' . $errors . '</div>';
+
+        echo $message;
+        
+        deactivate_plugins( plugin_basename( __FILE__ ) );
+        
     }
 
     /**
