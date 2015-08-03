@@ -95,7 +95,7 @@ class Dokan_Invoice {
         if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
             return ;
         }
-        
+  
         // Localize our plugin
         add_action( 'init', array( $this, 'localization_setup' ) );
 
@@ -155,19 +155,6 @@ class Dokan_Invoice {
          */
         wp_enqueue_style( 'dokan-invoice-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
 
-        /**
-         * All scripts goes here
-         */
-        //wp_enqueue_script( 'dokan-invoice-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), false, true );
-
-
-        /**
-         * Example for setting up text strings from Javascript files for localization
-         *
-         * Uncomment line below and replace with proper localization variables.
-         */
-        // $translation_array = array( 'some_string' => __( 'Some string to translate', 'dokan-invoice' ), 'a_value' => '10' );
-        // wp_localize_script( 'base-plugin-scripts', 'dokan-invoice', $translation_array ) );
     }
 
     /**
@@ -179,10 +166,10 @@ class Dokan_Invoice {
 
         //$listing_actions = '';
         if ( !is_admin() && !isset( $_GET['my_account'] ) ) {
-            return $listing_actions = array();
+            $listing_actions = array();
         }
 
-        $listing_actions[ 'test' ] = array(
+        $listing_actions[ 'dokan_seller_invoice' ] = array(
             'url' => wp_nonce_url( admin_url( 'admin-ajax.php?action=dokan_get_invoice&template_type=invoice&order_ids=' . $order->id ), 'dokan_get_invoice' ),
             'img' => WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
             'alt' => __( 'Dokan PDF Invoice', 'dokan-invoice' ),
@@ -241,7 +228,97 @@ class Dokan_Invoice {
         }
                
         //generate pdf
-        $wp_invoice_exp->generate_pdf_ajax();
+        //$wp_invoice_exp->generate_pdf_ajax();
+        if ( empty( $_GET['action'] ) || !is_user_logged_in() || !check_admin_referer( $_GET['action'] ) ) {
+            wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
+        }
+
+        // Check if all parameters are set
+        if ( empty( $_GET['template_type'] ) || empty( $_GET['order_ids'] ) ) {
+            wp_die( __( 'Some of the export parameters are missing.', 'wpo_wcpdf' ) );
+        }
+
+        
+        $order_ids = (array) explode( 'x', $_GET['order_ids'] );
+        // Process oldest first: reverse $order_ids array
+        $order_ids = array_reverse( $order_ids );
+
+        // User call from my-account page
+        if ( isset( $_GET['my-account'] ) ) {
+            // Only for single orders!
+            if ( count( $order_ids ) > 1 ) {
+                wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
+            }
+
+            // Get user_id of order
+            $wp_invoice_exp->order = new WC_Order( $order_ids[0] );
+
+            // Check if current user is owner of order IMPORTANT!!!
+            if ( $wp_invoice_exp->order->user_id != get_current_user_id() ) {
+                wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
+            }
+
+            // if we got here, we're safe to go!
+        } else {
+            // Check the user privileges
+            $wp_invoice_exp->order = new WC_Order( $order_ids[0] );
+            $items = $wp_invoice_exp->order->get_items();
+            
+            $products = array();
+            foreach ( $items as $product ) {
+               $seller_list[] = get_post_field( 'post_author', $product['product_id'] );
+            }
+            $seller_list = array_unique( $seller_list );
+            
+            if( in_array( get_current_user_id(), $seller_list ) ){
+                
+            }else {
+                wp_die( __( 'You do not have sufficient permissions to access this page.', 'dokan-invoice' ) );
+            }
+            
+        }
+
+        // Generate the output
+        $template_type = $_GET['template_type'];
+        // die($wp_invoice_exp->process_template( $template_type, $order_ids )); // or use the filter switch below!
+
+        if ( apply_filters( 'wpo_wcpdf_output_html', false, $template_type ) ) {
+            // Output html to browser for debug
+            // NOTE! images will be loaded with the server path by default
+            // use the wpo_wcpdf_use_path filter (return false) to change this to http urls
+            die( $wp_invoice_exp->process_template( $template_type, $order_ids ) );
+        }
+
+        if ( !($pdf = $wp_invoice_exp->get_pdf( $template_type, $order_ids )) ) {
+            exit;
+        }
+
+        $filename = $wp_invoice_exp->build_filename( $template_type, $order_ids, 'download' );
+
+        do_action( 'wpo_wcpdf_created_manually', $pdf, $filename );
+
+        // Get output setting
+        $output_mode = isset( $wp_invoice_exp->general_settings['download_display'] ) ? $wp_invoice_exp->general_settings['download_display'] : '';
+
+        // Switch headers according to output setting
+        if ( $output_mode == 'display' || empty( $output_mode ) ) {
+            header( 'Content-type: application/pdf' );
+            header( 'Content-Disposition: inline; filename="' . $filename . '"' );
+        } else {
+            header( 'Content-Description: File Transfer' );
+            header( 'Content-Type: application/octet-stream' );
+            header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+            header( 'Content-Transfer-Encoding: binary' );
+            header( 'Connection: Keep-Alive' );
+            header( 'Expires: 0' );
+            header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+            header( 'Pragma: public' );
+        }
+
+        // output PDF data
+        echo($pdf);
+
+        exit;
     }
 
     /**
