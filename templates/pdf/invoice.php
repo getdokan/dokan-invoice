@@ -50,17 +50,11 @@ $seller_list = array_unique( $seller_list );
         </td>
     </tr>
     <tr>
-        <td>
+        <td style="width: 50%">
             <h3 class="document-type-label">
                 <?php if ( $wpo_wcpdf->get_header_logo_id() ) echo apply_filters( 'wpo_wcpdf_invoice_title', __( 'Invoice', 'dokan-invoice' ) ); ?>
             </h3>
             <?php do_action( 'wpo_wcpdf_after_document_label', 'invoice' ); ?>
-        </td>
-        <td>&nbsp;</td>
-    </tr>
-
-    <tr>
-        <td>
             <div class="order-information">
                 <?php if ( isset( $wpo_wcpdf->settings->template_settings[ 'display_number' ] ) && $wpo_wcpdf->settings->template_settings[ 'display_number' ] == 'invoice_number' ) { ?>
                     <span class="order-number-label"><?php _e( 'Invoice Number:', 'dokan-invoice' ); ?></span>
@@ -78,10 +72,10 @@ $seller_list = array_unique( $seller_list );
                 <span class="order-payment"><?php $wpo_wcpdf->payment_method(); ?></span><br />
             </div>
         </td>
-        <td>
+        <td class="customer-info-block">
             <h3><?php _e( 'Customer Info', 'dokan-invoice' ) ?></h3>
             <div class="recipient-address"><?php $wpo_wcpdf->billing_address(); ?></div>
-        </td>
+        </td>    
     </tr>
 </table><!-- head container -->
 
