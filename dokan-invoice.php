@@ -325,13 +325,12 @@ class Dokan_Invoice {
                $seller_list[] = get_post_field( 'post_author', $product['product_id'] );
             }
             $seller_list = array_unique( $seller_list );
-            
-            if( in_array( get_current_user_id(), $seller_list ) ){
+                        
+            if ( in_array( get_current_user_id(), $seller_list ) || is_admin( get_current_user_id() ) ) {
                 
-            }else {
+            } else {
                 wp_die( __( 'You do not have sufficient permissions to access this page.', 'dokan-invoice' ) );
             }
-            
         }
 
         // Generate the output
