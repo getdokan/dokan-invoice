@@ -24,9 +24,9 @@ $store_email = '';
             <div class="shop-name"><h3><?php echo $shop_info[ 'store_name' ] ?></h3></div>
             <?php
             if ( $shop_info[ 'show_email' ] != 'off' && $shop_info[ 'show_email' ] != 'no' ) {
-                $store_email = get_user_meta( $seller_id, 'billing_email' );
+                $store_email = get_user_meta( $seller_id, 'billing_email', true );
                 ?>
-                <div class="shop-email"><i><?php echo $store_email[ 0 ]; ?></i></div>
+                <div class="shop-email"><i><?php echo $store_email; ?></i></div>
                 <?php
             }
             ?>
