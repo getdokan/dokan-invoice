@@ -154,20 +154,9 @@ class Dokan_Invoice {
   
         // Localize our plugin
         add_action( 'init', array( $this, 'localization_setup' ) );
-
         // Loads frontend scripts and styles
         //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-        //actions
-        //add_action( 'wp_ajax_dokan_get_invoice', array( $this, 'dokan_get_invoice_ajax' ) );
-        //add_action( 'wpo_wcpdf_process_template', array( $this, 'dokan_update_template_path' ) );
-
-        //filters
-        //add_filter( 'wpo_wcpdf_listing_actions', array( $this, 'dokan_invoice_listing_actions' ), 10, 2 );
-        //add_filter( 'wpo_wcpdf_myaccount_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 10, 2 );
-        add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
-        
-        
+        add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );       
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 1 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 1 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
@@ -219,27 +208,6 @@ class Dokan_Invoice {
     }
 
     /**
-     * Set Dokan_invoice buttons on Woocommerce Order page
-     * 
-     * Hooked with WP_invoice filter
-     */
-    function dokan_invoice_listing_actions( $listing_actions, $order ) {
-
-        //$listing_actions = '';
-        if ( !is_admin() && !isset( $_GET['my_account'] ) ) {
-            $listing_actions = array();
-        }
-
-        $listing_actions[ 'dokan_seller_invoice' ] = array(
-            'url' => wp_nonce_url( admin_url( 'admin-ajax.php?action=dokan_get_invoice&template_type=invoice&order_ids=' . $order->id ), 'dokan_get_invoice' ),
-            'img' => WooCommerce_PDF_Invoices::$plugin_url . 'images/invoice.png',
-            'alt' => __( 'Dokan PDF Invoice', 'dokan-invoice' ),
-        );
-
-        return $listing_actions;
-    }
-
-    /**
      * Set Dokan_invoice buttons on My Account page
      * 
      * Hooked with WP_invoice filter
@@ -255,148 +223,7 @@ class Dokan_Invoice {
 
         return $actions;
     }
-
-    /**
-     * Generate PDF          
-     */
-    function dokan_get_invoice_ajax() {
-        
-        $this->dokan_invoice_active = 1;
-        
-        // create a wp_invoice_export class object               
-        $wp_invoice_exp = new WooCommerce_PDF_Invoices_Export();
-
-        //change the deafult paths to this plugins path
-        $wp_invoice_exp->template_directory_name              = 'pdf';
-        $wp_invoice_exp->template_base_path                   = (defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $woocommerce->template_url) . $wp_invoice_exp->template_directory_name . '';
-        $wp_invoice_exp->template_default_base_path           = Dokan_Invoice::$plugin_path . 'templates/' . $wp_invoice_exp->template_directory_name . '/';
-        $wp_invoice_exp->template_default_base_uri            = Dokan_Invoice::$plugin_url . 'templates/' . $wp_invoice_exp->template_directory_name . '/';
-        $wp_invoice_exp->template_settings[ 'template_path' ] = $wp_invoice_exp->template_default_base_path;
-
-        global $wpo_wcpdf;
-
-        // replace default export instant 
-        
-        $wp_invoice_exp = $wpo_wcpdf->export ;
-        
-         //check order type
-        $order_id  = (int) $_GET['order_ids'];
-        $seller_id = dokan_get_seller_id_by_order( $order_id );
-        
-             
-        if ( $seller_id == 0 ) {
-           $_GET['template_type']='invoice';
-        }
-               
-        //generate pdf
-        //$wp_invoice_exp->generate_pdf_ajax();
-        if ( empty( $_GET['action'] ) || !is_user_logged_in() || !check_admin_referer( $_GET['action'] ) ) {
-            wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
-        }
-
-        // Check if all parameters are set
-        if ( empty( $_GET['template_type'] ) || empty( $_GET['order_ids'] ) ) {
-            wp_die( __( 'Some of the export parameters are missing.', 'wpo_wcpdf' ) );
-        }
-
-        
-        $order_ids = (array) explode( 'x', $_GET['order_ids'] );
-        // Process oldest first: reverse $order_ids array
-        $order_ids = array_reverse( $order_ids );
-
-        // User call from my-account page
-        if ( isset( $_GET['my-account'] ) ) {
-            // Only for single orders!
-            if ( count( $order_ids ) > 1 ) {
-                wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
-            }
-
-            // Get user_id of order
-            $wp_invoice_exp->order = new WC_Order( $order_ids[0] );
-
-            // Check if current user is owner of order IMPORTANT!!!
-            if ( $wp_invoice_exp->order->user_id != get_current_user_id() ) {
-                wp_die( __( 'You do not have sufficient permissions to access this page.', 'wpo_wcpdf' ) );
-            }
-
-            // if we got here, we're safe to go!
-        } else {
-            // Check the user privileges
-            $wp_invoice_exp->order = new WC_Order( $order_ids[0] );
-            $items = $wp_invoice_exp->order->get_items();
-            
-            $products = array();
-            foreach ( $items as $product ) {
-               $seller_list[] = get_post_field( 'post_author', $product['product_id'] );
-            }
-            $seller_list = array_unique( $seller_list );
-                        
-            if ( in_array( get_current_user_id(), $seller_list ) || is_admin( get_current_user_id() ) ) {
-                
-            } else {
-                wp_die( __( 'You do not have sufficient permissions to access this page.', 'dokan-invoice' ) );
-            }
-        }
-
-        // Generate the output
-        $template_type = $_GET['template_type'];
-        // die($wp_invoice_exp->process_template( $template_type, $order_ids )); // or use the filter switch below!
-
-        if ( apply_filters( 'wpo_wcpdf_output_html', false, $template_type ) ) {
-            // Output html to browser for debug
-            // NOTE! images will be loaded with the server path by default
-            // use the wpo_wcpdf_use_path filter (return false) to change this to http urls
-            die( $wp_invoice_exp->process_template( $template_type, $order_ids ) );
-        }
-
-        if ( !($pdf = $wp_invoice_exp->get_pdf( $template_type, $order_ids )) ) {
-            exit;
-        }
-
-        $filename = $wp_invoice_exp->build_filename( $template_type, $order_ids, 'download' );
-
-        do_action( 'wpo_wcpdf_created_manually', $pdf, $filename );
-
-        // Get output setting
-        $output_mode = isset( $wp_invoice_exp->general_settings['download_display'] ) ? $wp_invoice_exp->general_settings['download_display'] : '';
-
-        // Switch headers according to output setting
-        if ( $output_mode == 'display' || empty( $output_mode ) ) {
-            header( 'Content-type: application/pdf' );
-            header( 'Content-Disposition: inline; filename="' . $filename . '"' );
-        } else {
-            header( 'Content-Description: File Transfer' );
-            header( 'Content-Type: application/octet-stream' );
-            header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-            header( 'Content-Transfer-Encoding: binary' );
-            header( 'Connection: Keep-Alive' );
-            header( 'Expires: 0' );
-            header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-            header( 'Pragma: public' );
-        }
-
-        // output PDF data
-        echo($pdf);
-
-        exit;
-    }
-
-    /**
-     * Change the deafault template path to Dokan_invoice Template path
-     * if the request is sent from our plugin
-     *
-     * @uses load_plugin_textdomain()
-     */
-    function dokan_update_template_path() {
-        if ( $this->dokan_invoice_active == 1 ) {
-            global $wpo_wcpdf;
-
-            $wpo_wcpdf->export->template_path = $wpo_wcpdf->export->template_default_base_path;
-        }
-    }
-    
-    /****/
-    
+   
     /**
      * Filter Shop name according to Store name
      * 
