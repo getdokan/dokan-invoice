@@ -1,0 +1,14 @@
+====== Changelog ======
+
+v1.0.1 -> 2015-12-30
+------------------------
+- [tweak] Dependency Error Notice added
+- [tweak] Fully integrated with Woocommerce PDF invoices templates
+- [fix] Permission issue fixed for customer and admin
+- [fix] Style and template issue fixed
+- [fix] Seller email code issue fixed
+- [fix] Sellers can download their Sales Invoice from dashboard order page
+
+v1.0 -> 2015-08-02
+------------------------
+- Initial Release
