@@ -268,7 +268,7 @@ class Dokan_Invoice {
         //If parent order print Store names only after address else Print Seller Store Address
         if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
 
-            $shop_address = "<br>" . $shop_address . "<br>" . '<i>From Sellers : </i>';
+            $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From Sellers:', 'dokan-invoice' ) . ' </i>';
             $seller_list  = array();
             $items        = $wpo_wcpdf->export->order->get_items();
             foreach ( $items as $product ) {
