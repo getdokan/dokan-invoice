@@ -240,14 +240,32 @@ class Dokan_Invoice {
         global $wpo_wcpdf;
         // If parent order keep Original Store name else set seller store name
         if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
-            return $shop_name;
+
+            $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+
+            if ( count( $seller_list ) > 1 ) {
+
+                return $shop_name;
+
+            } else {
+
+                $seller_id  = $seller_list[0];
+                
+                $store_info = dokan_get_store_info( $seller_id );
+
+                $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+
+                return $shop_name . '<br /><br />Seller: ' . $store_name;
+            }
+
         } else {
+
             $seller_id  = $wpo_wcpdf->export->order->post->post_author;
             $store_info = dokan_get_store_info( $seller_id );
 
-            $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+            $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
 
-            return $shop_name;
+            return $shop_name . '<br /><br />Seller: ' . $store_name;
         }
     }
 
@@ -268,38 +286,48 @@ class Dokan_Invoice {
         //If parent order print Store names only after address else Print Seller Store Address
         if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
 
-            $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From Sellers:', 'dokan-invoice' ) . ' </i>';
-            $seller_list  = array();
-            $items        = $wpo_wcpdf->export->order->get_items();
-            foreach ( $items as $product ) {
-                $products[]    = array(
-                    'name'      => $product['name'],
-                    'id'        => $product['product_id'],
-                    'seller_id' => get_post_field( 'post_author', $product['product_id'] )
-                );
-                $seller_list[] = get_post_field( 'post_author', $product['product_id'] );
-            }
+            $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+            
+            if ( count( $seller_list ) > 1 ) {
 
-            $seller_list = array_unique( $seller_list );
+                $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From Sellers:', 'dokan-invoice' ) . ' </i>';
 
-            foreach ( $seller_list as $seller ) {
+                foreach ( $seller_list as $seller ) {
 
-                $store_info   = dokan_get_store_info( $seller );
-                $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-                $shop_address = $shop_address . "<div class='shop-name'><h3>" . $shop_name . "</h3></div>";
+                    $store_info   = dokan_get_store_info( $seller );
+
+                    $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+                    
+                    $shop_address = $shop_address . "<div class='shop-name'><h3>" . $shop_name . "</h3></div>";
+                
+                }
+
+            } else {
+
+                $seller_id  = $seller_list[0];
+
+                $store_info = dokan_get_store_info( $seller_id );
+
+                $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+                
+                $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
+            
             }
 
             return $shop_address;
+
         } else {
 
             $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            
             $store_info = dokan_get_store_info( $seller_id );
-
+            
             $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-
+            
             $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
-
+            
             return $shop_address;
+
         }
     }
 
