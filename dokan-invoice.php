@@ -241,7 +241,15 @@ class Dokan_Invoice {
         // If parent order keep Original Store name else set seller store name
         if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
 
-            $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+            if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
+
+                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+
+            } else {
+
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+
+            }
 
             if ( count( $seller_list ) > 1 ) {
 
@@ -250,7 +258,7 @@ class Dokan_Invoice {
             } else {
 
                 $seller_id  = $seller_list[0];
-                
+
                 $store_info = dokan_get_store_info( $seller_id );
 
                 $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
@@ -261,6 +269,7 @@ class Dokan_Invoice {
         } else {
 
             $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            
             $store_info = dokan_get_store_info( $seller_id );
 
             $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
@@ -286,7 +295,15 @@ class Dokan_Invoice {
         //If parent order print Store names only after address else Print Seller Store Address
         if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
 
-            $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+            if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
+
+                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+
+            } else {
+
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+
+            }
             
             if ( count( $seller_list ) > 1 ) {
 
