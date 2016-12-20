@@ -64,12 +64,12 @@ module.exports = function(grunt) {
             main: {
                 options: {
                     mode: 'zip',
-                    archive: './build/erp-v' + pkg.version + '.zip'
+                    archive: './build/dokan-invoice' + '.zip'
                 },
                 expand: true,
                 cwd: 'build/',
                 src: ['**/*'],
-                dest: 'erp'
+                dest: 'dokan-invoice'
             }
         },
 
