@@ -1,5 +1,11 @@
 ====== Changelog ======
 
+v1.0.2 -> 20 December 2016
+------------------------
+- [fix] Text domain
+- [New] Compatibility with older versions
+- [New] Vendor Information on the PDF file.
+
 v1.0.1 -> 2015-12-30
 ------------------------
 - [tweak] Dependency Error Notice added
