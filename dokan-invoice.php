@@ -263,7 +263,7 @@ class Dokan_Invoice {
 
                 $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
 
-                return $shop_name . '<br /><br />Seller: ' . $store_name;
+                return $shop_name . '<br /><br />Vendor: ' . $store_name;
             }
 
         } else {
@@ -274,7 +274,7 @@ class Dokan_Invoice {
 
             $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
 
-            return $shop_name . '<br /><br />Seller: ' . $store_name;
+            return $shop_name . '<br /><br />Vendor: ' . $store_name;
         }
     }
 
@@ -307,7 +307,7 @@ class Dokan_Invoice {
             
             if ( count( $seller_list ) > 1 ) {
 
-                $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From Sellers:', 'dokan-invoice' ) . ' </i>';
+                $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From vendors:', 'dokan-invoice' ) . ' </i>';
 
                 foreach ( $seller_list as $seller ) {
 
