@@ -53,6 +53,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+= 1.0.3 =
+------------------------
+- [new] Compatibility with WooCommerce 3.0+
+- [fix] showing warning on Order action under My Account page
+
 = 1.0.2 =
 * [fix] Text domain
 * [New] Compatibility with older versions
