@@ -3,17 +3,21 @@ module.exports = function(grunt) {
     var pkg = grunt.file.readJSON('package.json');
 
     grunt.initConfig({
+        // setting folder templates
+        dirs: {
+            css: 'assets/css'
+        },
 
         // Generate POT files.
         makepot: {
             target: {
                 options: {
-                    exclude: ['build/.*', 'node_modules/*', 'assets/*'],
+                    exclude: ['build/.*'],
                     domainPath: '/languages/', // Where to save the POT file.
-                    potFilename: 'dokan-invoice.pot', // Name of the POT file.
+                    potFilename: pkg.slug + '.pot', // Name of the POT file.
                     type: 'wp-plugin', // Type of project (wp-plugin or wp-theme).
                     potHeaders: {
-                        'report-msgid-bugs-to': 'http://wperp.com/support/',
+                        'report-msgid-bugs-to': 'support@wedevs.com',
                         'language-team': 'LANGUAGE <EMAIL@ADDRESS>'
                     }
                 }
@@ -31,28 +35,22 @@ module.exports = function(grunt) {
                 src: [
                     '**',
                     '!node_modules/**',
-                    '!.codekit-cache/**',
-                    '!.idea/**',
                     '!build/**',
                     '!bin/**',
                     '!.git/**',
                     '!Gruntfile.js',
                     '!package.json',
-                    '!composer.json',
-                    '!composer.lock',
                     '!debug.log',
                     '!phpunit.xml',
                     '!.gitignore',
                     '!.gitmodules',
                     '!npm-debug.log',
                     '!plugin-deploy.sh',
-                    '!export.sh',
-                    '!config.codekit',
-                    '!nbproject/*',
                     '!assets/less/**',
                     '!tests/**',
-                    '!README.md',
-                    '!CONTRIBUTING.md',
+                    '!**/Gruntfile.js',
+                    '!**/package.json',
+                    '!**/README.md',
                     '!**/*~'
                 ],
                 dest: 'build/'
@@ -64,14 +62,25 @@ module.exports = function(grunt) {
             main: {
                 options: {
                     mode: 'zip',
-                    archive: './build/dokan-invoice' + '.zip'
+                    archive: './build/'+ pkg.slug + '-v' + pkg.version + '.zip'
                 },
                 expand: true,
                 cwd: 'build/',
                 src: ['**/*'],
-                dest: 'dokan-invoice'
+                dest: pkg.slug
             }
         },
+
+        replace: {
+            version_no: {
+                src: pkg.slug + '.php',
+                overwrite: true,
+                replacements: [{
+                        from: /Version:\s*(.*)/,
+                        to: 'Version: ' + pkg.version
+                }]
+            }
+        }
 
     });
 
@@ -80,10 +89,19 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks( 'grunt-contrib-clean' );
     grunt.loadNpmTasks( 'grunt-contrib-copy' );
     grunt.loadNpmTasks( 'grunt-contrib-compress' );
-    
-    grunt.registerTask('default', ['makepot']);
+    grunt.loadNpmTasks( 'grunt-text-replace' );
 
     grunt.registerTask( 'release', [
-        'makepot', 'clean', 'copy', 'compress'
+        'replace',
+        'makepot',
+        'clean',
+        'copy',
+        'compress'
     ]);
+
+    grunt.registerTask( 'zip', [
+        'clean',
+        'copy',
+        'compress'
+    ])
 };
