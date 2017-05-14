@@ -4,7 +4,7 @@ Donate link: http://tareq.wedevs.com/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
 Tested up to: 4.7
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.0.3 =
+------------------------
+- [new] Compatibility with WooCommerce 3.0+
+- [fix] showing warning on Order action under My Account page
 
 = 1.0.2 =
 * [fix] Text domain
