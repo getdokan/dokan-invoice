@@ -1,18 +1,18 @@
 <?php
 
 /*
-  Plugin Name: Dokan PDF Invoice
-  Plugin URI: http://wedevs.com/
+  Plugin Name: Dokan - PDF Invoice
+  Plugin URI: https://wedevs.com/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 1.0
-  Author: WeDevs
-  Author URI: http://wedevs.com/
+  Version: 1.0.3
+  Author: weDevs
+  Author URI: https://wedevs.com/
   License: GPL2
   Text Domain: dokan-invoice
  */
 
 /**
- * Copyright (c) YEAR Your Name (email: Email). All rights reserved.
+ * Copyright (c) 2017 weDevs (email: info@wedevs.com). All rights reserved.
  *
  * Released under the GPL license
  * http://www.opensource.org/licenses/gpl-license.php
