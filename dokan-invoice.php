@@ -213,14 +213,15 @@ class Dokan_Invoice {
      * Hooked with WP_invoice filter
      */
     function dokan_invoice_listing_actions_my_account( $actions, $order ) {
-        //$actions = '';
-        if ( get_post_meta( $order->id, '_wcpdf_invoice_exists', true ) || in_array( $order->status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+        $order_id = dokan_get_prop( $order, 'id' );
+        $order_status = dokan_get_prop( $order, 'status' );
+        if ( get_post_meta( $order_id, '_wcpdf_invoice_exists', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
             $actions[ 'invoice' ] = array(
-                'url'  => wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&my-account&template_type=invoice&order_ids=' . $order->id ), 'generate_wpo_wcpdf' ),
+                'url'  => wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&my-account&template_type=invoice&order_ids=' . $order_id ), 'generate_wpo_wcpdf' ),
                 'name' => apply_filters( 'dokan_invoice_myaccount_button_text', __( 'Download invoice (PDF)', 'dokan-invoice' ) )          
             );
         }
-
+        
         return $actions;
     }
    
