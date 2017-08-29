@@ -350,16 +350,21 @@ class Dokan_Invoice {
     }
 
     /**
-     * Set seller permission true if oreder consists his item
+     * Set seller permission true if order contains his item
+     * filter flipped value in WCPDF 2.0:
+     * To allow, 1.6 requires false, 2.0 requires true
      * 
-     * @param type $not_allowed
-     * @param type $order_ids
-     * @return boolean
+     * @param bool  $allowed (1.6: not allowed)
+     * @param array $order_ids
+     * @return bool $allowed (1.6: not allowed)
      */
-    function wpo_wcpdf_dokan_privs( $not_allowed, $order_ids ) {
-        
+    function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
+        // flip value for 1.6 and older
+        $flip_value = class_exists('WooCommerce_PDF_Invoices') && version_compare( WooCommerce_PDF_Invoices::$version, '2.0', '<' ) ? true : false;
+        $allowed = $flip_value ? !$allowed : $allowed;
+
         // check if user is seller
-        if ( $not_allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
+        if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
             
             if ( count( $order_ids ) == 1 ) {
                 
@@ -369,12 +374,11 @@ class Dokan_Invoice {
                 $current_user = get_current_user_id();
                 
                 if ( $current_user == $seller_id ) {
-                    return false; // this seller is allowed
+                    return $flip_value ? false : true; // this seller is allowed
                 } else {
-                    return true;
+                    return $flip_value ? true : false;
                 }
             }
-
             foreach ( $order_ids as $order_id ) {
                 // get seller_id
                 $seller_id     = dokan_get_seller_id_by_order( $order_id );
@@ -386,17 +390,16 @@ class Dokan_Invoice {
                     $item_seller = get_post_field( 'post_author', $item['product_id'] );
                     // check if item is from this seller
                     if ( $item_seller != $seller_id ) {
-                        return true; // not allowed!
+                        return $flip_value ? true : false; // not allowed!
                     }
                 }
             }
             // if we got here, that means the user is a seller and all orders and items belong to this seller
-            return false; // allowed!
+            return $flip_value ? false : true; // allowed!
         } else {
-            return $not_allowed; // preserve original check result
+            return $flip_value ? !$allowed : $allowed; // preserve original check result
         }
     }
-
 }
 
 $dokan_invoice = Dokan_Invoice::init();
