@@ -239,16 +239,21 @@ class Dokan_Invoice {
     function wpo_wcpdf_add_dokan_shop_name( $shop_name ) {
 
         global $wpo_wcpdf;
+        
+        $order     = $wpo_wcpdf->export->order;
+        $order_id  = dokan_get_prop( $order, 'id' );
+        $parent_id = wp_get_post_parent_id( $order_id );
+        
         // If parent order keep Original Store name else set seller store name
-        if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
+        if ( $parent_id == 0 ) {
 
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
 
-                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+                $seller_list = dokan_get_seller_ids_by( $order_id );
 
             } else {
 
-                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
 
             }
 
@@ -269,7 +274,7 @@ class Dokan_Invoice {
 
         } else {
 
-            $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            $seller_id  = get_post_field( 'post_author' , $order_id );
             
             $store_info = dokan_get_store_info( $seller_id );
 
@@ -292,17 +297,21 @@ class Dokan_Invoice {
      */
     function wpo_wcpdf_add_dokan_shop_details( $shop_address ) {
         global $wpo_wcpdf;
+        
+        $order     = $wpo_wcpdf->export->order;
+        $order_id  = dokan_get_prop( $order, 'id' );
+        $parent_id = wp_get_post_parent_id( $order_id );
 
         //If parent order print Store names only after address else Print Seller Store Address
-        if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
+        if ( $parent_id == 0 ) {
 
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
 
-                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+                $seller_list = dokan_get_seller_ids_by( $order_id );
 
             } else {
 
-                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
 
             }
             
@@ -336,7 +345,7 @@ class Dokan_Invoice {
 
         } else {
 
-            $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            $seller_id  = get_post_field( 'post_author' , $order_id );
             
             $store_info = dokan_get_store_info( $seller_id );
             
