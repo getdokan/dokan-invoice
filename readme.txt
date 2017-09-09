@@ -1,5 +1,5 @@
 === Dokan Invoice ===
-Contributors: tareq1988, wedevs
+Contributors: tareq1988, wedevs, rafsuntaskin
 Donate link: http://tareq.wedevs.com/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
@@ -53,6 +53,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+v1.1.0 -> 9 September 2017
+------------------------
+- [new] Compatibility with WooCommerce PDF Invoices & packing slips 2.0+
+- [fix] showing error on Order action for vendor dashboard
+
 = 1.0.3 =
 ------------------------
 - [new] Compatibility with WooCommerce 3.0+
@@ -73,3 +78,8 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 = 1.0 =
 * Initial Release
+
+== Upgrade Notice ==
+
+= 1.1.0 =
+**Important Update** This update is compatible with WooCommerce PDF Invoices & Packing Slips 2.0+ . Make sure to update to the latest version of **WooCommerce PDF Invoices & Packing Slips** before updating.

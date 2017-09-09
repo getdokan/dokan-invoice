@@ -1,10 +1,10 @@
-# Copyright (C) 2017 WeDevs
+# Copyright (C) 2017 weDevs
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Dokan PDF Invoice 1.0.3\n"
+"Project-Id-Version: Dokan - PDF Invoice 1.1.0\n"
 "Report-Msgid-Bugs-To: support@wedevs.com\n"
-"POT-Creation-Date: 2017-05-14 06:35:18+00:00\n"
+"POT-Creation-Date: 2017-09-09 08:50:12+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -29,21 +29,21 @@ msgstr ""
 msgid "Download invoice (PDF)"
 msgstr ""
 
-#: dokan-invoice.php:265 dokan-invoice.php:276 dokan-invoice.php:317
-#: dokan-invoice.php:329 dokan-invoice.php:343
+#: dokan-invoice.php:270 dokan-invoice.php:281 dokan-invoice.php:326
+#: dokan-invoice.php:338 dokan-invoice.php:352
 msgid "store_info"
 msgstr ""
 
-#: dokan-invoice.php:311
+#: dokan-invoice.php:320
 msgid "From vendors:"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-msgid "Dokan PDF Invoice"
+msgid "Dokan - PDF Invoice"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "http://wedevs.com/"
+msgid "https://wedevs.com/"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -51,5 +51,5 @@ msgid "A Dokan plugin Add-on to get PDF invoice."
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "WeDevs"
+msgid "weDevs"
 msgstr ""

@@ -4,7 +4,7 @@
   Plugin Name: Dokan - PDF Invoice
   Plugin URI: https://wedevs.com/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 1.0.3
+  Version: 1.1.0
   Author: weDevs
   Author URI: https://wedevs.com/
   License: GPL2
@@ -239,16 +239,21 @@ class Dokan_Invoice {
     function wpo_wcpdf_add_dokan_shop_name( $shop_name ) {
 
         global $wpo_wcpdf;
+        
+        $order     = $wpo_wcpdf->export->order;
+        $order_id  = dokan_get_prop( $order, 'id' );
+        $parent_id = wp_get_post_parent_id( $order_id );
+        
         // If parent order keep Original Store name else set seller store name
-        if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
+        if ( $parent_id == 0 ) {
 
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
 
-                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+                $seller_list = dokan_get_seller_ids_by( $order_id );
 
             } else {
 
-                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
 
             }
 
@@ -269,7 +274,7 @@ class Dokan_Invoice {
 
         } else {
 
-            $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            $seller_id  = get_post_field( 'post_author' , $order_id );
             
             $store_info = dokan_get_store_info( $seller_id );
 
@@ -292,17 +297,21 @@ class Dokan_Invoice {
      */
     function wpo_wcpdf_add_dokan_shop_details( $shop_address ) {
         global $wpo_wcpdf;
+        
+        $order     = $wpo_wcpdf->export->order;
+        $order_id  = dokan_get_prop( $order, 'id' );
+        $parent_id = wp_get_post_parent_id( $order_id );
 
         //If parent order print Store names only after address else Print Seller Store Address
-        if ( $wpo_wcpdf->export->order->post->post_parent == 0 ) {
+        if ( $parent_id == 0 ) {
 
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
 
-                $seller_list = dokan_get_seller_ids_by( $wpo_wcpdf->export->order->id );
+                $seller_list = dokan_get_seller_ids_by( $order_id );
 
             } else {
 
-                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $wpo_wcpdf->export->order->id ) ) );
+                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
 
             }
             
@@ -336,7 +345,7 @@ class Dokan_Invoice {
 
         } else {
 
-            $seller_id  = $wpo_wcpdf->export->order->post->post_author;
+            $seller_id  = get_post_field( 'post_author' , $order_id );
             
             $store_info = dokan_get_store_info( $seller_id );
             
@@ -352,14 +361,13 @@ class Dokan_Invoice {
     /**
      * Set seller permission true if oreder consists his item
      * 
-     * @param type $not_allowed
+     * @param type $allowed
      * @param type $order_ids
      * @return boolean
      */
-    function wpo_wcpdf_dokan_privs( $not_allowed, $order_ids ) {
-        
+    function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
         // check if user is seller
-        if ( $not_allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
+        if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
             
             if ( count( $order_ids ) == 1 ) {
                 
@@ -369,9 +377,9 @@ class Dokan_Invoice {
                 $current_user = get_current_user_id();
                 
                 if ( $current_user == $seller_id ) {
-                    return false; // this seller is allowed
+                    return true; // this seller is allowed
                 } else {
-                    return true;
+                    return false;
                 }
             }
 
@@ -391,9 +399,9 @@ class Dokan_Invoice {
                 }
             }
             // if we got here, that means the user is a seller and all orders and items belong to this seller
-            return false; // allowed!
+            return true; // allowed!
         } else {
-            return $not_allowed; // preserve original check result
+            return $allowed; // preserve original check result
         }
     }
 
