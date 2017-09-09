@@ -53,6 +53,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+v1.1.0 -> 9 September 2017
+------------------------
+- [new] Compatibility with WooCommerce PDF Invoices & packing slips 2.0+
+- [fix] showing error on Order action for vendor dashboard
+
 = 1.0.3 =
 ------------------------
 - [new] Compatibility with WooCommerce 3.0+
