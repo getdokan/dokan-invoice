@@ -352,14 +352,13 @@ class Dokan_Invoice {
     /**
      * Set seller permission true if oreder consists his item
      * 
-     * @param type $not_allowed
+     * @param type $allowed
      * @param type $order_ids
      * @return boolean
      */
-    function wpo_wcpdf_dokan_privs( $not_allowed, $order_ids ) {
-        
+    function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
         // check if user is seller
-        if ( $not_allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
+        if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
             
             if ( count( $order_ids ) == 1 ) {
                 
@@ -369,9 +368,9 @@ class Dokan_Invoice {
                 $current_user = get_current_user_id();
                 
                 if ( $current_user == $seller_id ) {
-                    return false; // this seller is allowed
+                    return true; // this seller is allowed
                 } else {
-                    return true;
+                    return false;
                 }
             }
 
@@ -391,9 +390,9 @@ class Dokan_Invoice {
                 }
             }
             // if we got here, that means the user is a seller and all orders and items belong to this seller
-            return false; // allowed!
+            return true; // allowed!
         } else {
-            return $not_allowed; // preserve original check result
+            return $allowed; // preserve original check result
         }
     }
 
