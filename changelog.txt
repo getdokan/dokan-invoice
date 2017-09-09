@@ -1,5 +1,10 @@
 ====== Changelog ======
 
+v1.1.0 -> 9 September 2017
+------------------------
+- [new] Compatibility with WooCommerce PDF Invoices & packing slips 2.0+
+- [fix] showing error on Order action for vendor dashboard
+
 v1.0.3 -> 14 May 2017
 ------------------------
 - [new] Compatibility with WooCommerce 3.0+

@@ -4,7 +4,7 @@
   Plugin Name: Dokan - PDF Invoice
   Plugin URI: https://wedevs.com/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 1.0.3
+  Version: 1.1.0
   Author: weDevs
   Author URI: https://wedevs.com/
   License: GPL2
