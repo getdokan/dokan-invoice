@@ -157,8 +157,8 @@ class Dokan_Invoice {
         // Loads frontend scripts and styles
         //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );       
-        add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 1 );
-        add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 1 );
+        add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
+        add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
     }
 
@@ -236,48 +236,30 @@ class Dokan_Invoice {
      * 
      * @return string $shop_name
      */
-    function wpo_wcpdf_add_dokan_shop_name( $shop_name ) {
-
-        global $wpo_wcpdf;
-        
-        $order     = $wpo_wcpdf->export->order;
-        $order_id  = dokan_get_prop( $order, 'id' );
-        $parent_id = wp_get_post_parent_id( $order_id );
+    function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
+        // get $order_id & $parent_id
+        extract( $this->get_order_id_parent_id( $document ) );
         
         // If parent order keep Original Store name else set seller store name
         if ( $parent_id == 0 ) {
-
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
-
                 $seller_list = dokan_get_seller_ids_by( $order_id );
-
             } else {
-
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
-
             }
-
+            
             if ( count( $seller_list ) > 1 ) {
-
                 return $shop_name;
-
             } else {
-
                 $seller_id  = $seller_list[0];
-
                 $store_info = dokan_get_store_info( $seller_id );
-
                 $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
 
                 return $shop_name . '<br /><br />Vendor: ' . $store_name;
             }
-
         } else {
-
             $seller_id  = get_post_field( 'post_author' , $order_id );
-            
             $store_info = dokan_get_store_info( $seller_id );
-
             $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
 
             return $shop_name . '<br /><br />Vendor: ' . $store_name;
@@ -295,66 +277,40 @@ class Dokan_Invoice {
      * 
      * @return string $shop_address
      */
-    function wpo_wcpdf_add_dokan_shop_details( $shop_address ) {
-        global $wpo_wcpdf;
-        
-        $order     = $wpo_wcpdf->export->order;
-        $order_id  = dokan_get_prop( $order, 'id' );
-        $parent_id = wp_get_post_parent_id( $order_id );
+    function wpo_wcpdf_add_dokan_shop_details( $shop_address, $document = null ) {
+        // get $order_id & $parent_id
+        extract( $this->get_order_id_parent_id( $document ) );
 
         //If parent order print Store names only after address else Print Seller Store Address
         if ( $parent_id == 0 ) {
-
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
-
                 $seller_list = dokan_get_seller_ids_by( $order_id );
-
             } else {
-
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
-
             }
             
             if ( count( $seller_list ) > 1 ) {
-
                 $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From vendors:', 'dokan-invoice' ) . ' </i>';
-
                 foreach ( $seller_list as $seller ) {
-
                     $store_info   = dokan_get_store_info( $seller );
-
                     $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-                    
                     $shop_address = $shop_address . "<div class='shop-name'><h3>" . $shop_name . "</h3></div>";
-                
                 }
-
             } else {
-
                 $seller_id  = $seller_list[0];
-
                 $store_info = dokan_get_store_info( $seller_id );
-
                 $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-                
                 $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
-            
             }
 
             return $shop_address;
-
         } else {
-
             $seller_id  = get_post_field( 'post_author' , $order_id );
-            
             $store_info = dokan_get_store_info( $seller_id );
-            
             $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-            
             $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
             
             return $shop_address;
-
         }
     }
 
@@ -403,6 +359,25 @@ class Dokan_Invoice {
         } else {
             return $allowed; // preserve original check result
         }
+    }
+
+    function get_order_id_parent_id( $document = null ) {
+        if (empty($document) || empty($document->order)) {
+            // PDF Invoice 1.X backwards compatibility
+            global $wpo_wcpdf;
+            $order     = $wpo_wcpdf->export->order;
+            $order_id  = dokan_get_prop( $order, 'id' );
+            $parent_id = wp_get_post_parent_id( $order_id );
+        } else {
+            if ( $document->is_refund( $document->order ) ) {
+                $order_id = $document->get_refund_parent_id( $document->order );
+            } else {
+                $order_id = $document->order_id;
+            }
+            $parent_id = wp_get_post_parent_id( $order_id );
+        }
+
+        return compact('order_id','parent_id');
     }
 
 }
