@@ -323,7 +323,7 @@ class Dokan_Invoice {
 
                     $store_info   = dokan_get_store_info( $seller );
 
-                    $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+                    $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : sprintf(__( 'store_info', 'dokan-invoice' ), $shop_name);
                     
                     $shop_address = $shop_address . "<div class='shop-name'><h3>" . $shop_name . "</h3></div>";
                 
