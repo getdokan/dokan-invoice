@@ -51,10 +51,10 @@ class Dokan_Invoice {
     public static $plugin_path;
     public static $plugin_basename;
     protected $dokan_invoice_active = 0;
-    
+
     private $depends_on = array();
     private $dependency_error = array();
-   
+
     /**
      * Constructor for the Dokan_Invoice class
      *
@@ -71,53 +71,53 @@ class Dokan_Invoice {
         self::$plugin_basename = plugin_basename( __FILE__ );
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
-        
+
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );        
-        
+        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+
         $this->depends_on['dokan'] = array(
             'name' => 'WeDevs_Dokan',
             'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
         );
-        
+
         $this->depends_on['woocommerce_pdf_invoices'] = array(
             'name' => 'WooCommerce_PDF_Invoices',
             'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
         );
-        
+
         add_action( 'init', array( $this,'is_dependency_available') );
-        
+
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
-    
+
     /**
      * check if dependencies installed or not and add error notice
      * @since 1.0.0
      */
     function is_dependency_available(){
-        
+
         $res = true;
-        
+
         foreach ( $this->depends_on as $class ){
-            if ( !class_exists( $class['name'] ) ){                
+            if ( !class_exists( $class['name'] ) ){
                 $this->dependency_error[] = $class['notice'];
                 $res = false;
             }
         }
-        
+
         if ($res == false){
             add_action( 'admin_notices', array ( $this, 'dependency_notice' ) );
         }
-        
+
         return $res;
     }
-    
+
     /*
      * print error notice if dependency not active
      * @since 1.0.0
      */
     function dependency_notice(){
-                
+
         $errors = '';
         $error = '';
         foreach ( $this->dependency_error as $error ) {
@@ -126,9 +126,9 @@ class Dokan_Invoice {
         $message = '<div class="error">' . $errors . '</div>';
 
         echo $message;
-        
+
         deactivate_plugins( plugin_basename( __FILE__ ) );
-        
+
     }
 
     /**
@@ -145,18 +145,18 @@ class Dokan_Invoice {
 
         return $instance;
     }
-    
+
     function init_hooks() {
-        
+
         if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
             return ;
         }
-  
+
         // Localize our plugin
         add_action( 'init', array( $this, 'localization_setup' ) );
         // Loads frontend scripts and styles
         //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );       
+        add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
@@ -168,7 +168,7 @@ class Dokan_Invoice {
      * Nothing being called here yet.
      */
     public function activate() {
-        
+
     }
 
     /**
@@ -177,7 +177,7 @@ class Dokan_Invoice {
      * Nothing being called here yet.
      */
     public function deactivate() {
-        
+
     }
 
     /**
@@ -209,7 +209,7 @@ class Dokan_Invoice {
 
     /**
      * Set Dokan_invoice buttons on My Account page
-     * 
+     *
      * Hooked with WP_invoice filter
      */
     function dokan_invoice_listing_actions_my_account( $actions, $order ) {
@@ -218,28 +218,28 @@ class Dokan_Invoice {
         if ( get_post_meta( $order_id, '_wcpdf_invoice_exists', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
             $actions[ 'invoice' ] = array(
                 'url'  => wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&my-account&template_type=invoice&order_ids=' . $order_id ), 'generate_wpo_wcpdf' ),
-                'name' => apply_filters( 'dokan_invoice_myaccount_button_text', __( 'Download invoice (PDF)', 'dokan-invoice' ) )          
+                'name' => apply_filters( 'dokan_invoice_myaccount_button_text', __( 'Download invoice (PDF)', 'dokan-invoice' ) )
             );
         }
-        
+
         return $actions;
     }
-   
+
     /**
      * Filter Shop name according to Store name
-     * 
+     *
      * @since 1.1
-     * 
+     *
      * @global type $wpo_wcpdf
-     * 
+     *
      * @param type $shop_name
-     * 
+     *
      * @return string $shop_name
      */
     function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
         // get $order_id & $parent_id
         extract( $this->get_order_id_parent_id( $document ) );
-        
+
         // If parent order keep Original Store name else set seller store name
         if ( $parent_id == 0 ) {
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
@@ -247,34 +247,36 @@ class Dokan_Invoice {
             } else {
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
             }
-            
+
             if ( count( $seller_list ) > 1 ) {
                 return $shop_name;
             } else {
-                $seller_id  = $seller_list[0];
-                $store_info = dokan_get_store_info( $seller_id );
-                $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+                $vendor_id  = $seller_list[0];
+                $vendor     = dokan()->vendor->get( $vendor_id );
+                $store_name = $vendor->get_shop_name();
+                $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
 
                 return $shop_name . '<br /><br />Vendor: ' . $store_name;
             }
         } else {
-            $seller_id  = get_post_field( 'post_author' , $order_id );
-            $store_info = dokan_get_store_info( $seller_id );
-            $store_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+            $vendor_id  = dokan_get_seller_id_by_order( $order_id );
+            $vendor     = dokan()->vendor->get( $vendor_id );
+            $store_name = $vendor->get_shop_name();
+            $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
 
             return $shop_name . '<br /><br />Vendor: ' . $store_name;
         }
     }
 
     /**
-     * Filter Shop address 
-     * 
+     * Filter Shop address
+     *
      * @since 1.1
-     * 
+     *
      * @global type $wpo_wcpdf
-     *   
+     *
      * @param type $shop_address
-     * 
+     *
      * @return string $shop_address
      */
     function wpo_wcpdf_add_dokan_shop_details( $shop_address, $document = null ) {
@@ -288,35 +290,32 @@ class Dokan_Invoice {
             } else {
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
             }
-            
+
             if ( count( $seller_list ) > 1 ) {
                 $shop_address = "<br>" . $shop_address . "<br>" . '<i>' . __( 'From vendors:', 'dokan-invoice' ) . ' </i>';
                 foreach ( $seller_list as $seller ) {
-                    $store_info   = dokan_get_store_info( $seller );
-                    $shop_name    = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
+                    $vendor       = dokan()->vendor->get( $seller );
+                    $shop_name    = $vendor->get_shop_name();
+                    $shop_name    = ! empty( $shop_name ) ? $shop_name : __( 'store_info', 'dokan-invoice' );
                     $shop_address = $shop_address . "<div class='shop-name'><h3>" . $shop_name . "</h3></div>";
                 }
             } else {
-                $seller_id  = $seller_list[0];
-                $store_info = dokan_get_store_info( $seller_id );
-                $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-                $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
-            }
+                $vendor_id      = $seller_list[0];
+                $shop_address   = "<br>" . dokan_get_seller_address( $vendor_id );
+              }
 
             return $shop_address;
         } else {
-            $seller_id  = get_post_field( 'post_author' , $order_id );
-            $store_info = dokan_get_store_info( $seller_id );
-            $shop_name = !empty( $store_info['store_name'] ) ? $store_info['store_name'] : __( 'store_info', 'dokan-invoice' );
-            $shop_address = "<br>" . dokan_get_seller_address( $seller_id );
-            
+            $vendor_id    = dokan_get_seller_id_by_order( $order_id );
+            $shop_address = "<br>" . dokan_get_seller_address( $vendor_id );
+
             return $shop_address;
         }
     }
 
     /**
      * Set seller permission true if oreder consists his item
-     * 
+     *
      * @param type $allowed
      * @param type $order_ids
      * @return boolean
@@ -324,14 +323,14 @@ class Dokan_Invoice {
     function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
         // check if user is seller
         if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
-            
+
             if ( count( $order_ids ) == 1 ) {
-                
+
                 $order        = new WC_Order( $order_ids );
                 $items        = $order->get_items();
                 $seller_id    = dokan_get_seller_id_by_order( $order_ids );
                 $current_user = get_current_user_id();
-                
+
                 if ( $current_user == $seller_id ) {
                     return true; // this seller is allowed
                 } else {
