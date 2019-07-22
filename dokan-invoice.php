@@ -72,9 +72,6 @@ class Dokan_Invoice {
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
 
-        register_activation_hook( __FILE__, array( $this, 'activate' ) );
-        register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
-
         $this->depends_on['dokan'] = array(
             'name' => 'WeDevs_Dokan',
             'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
@@ -95,7 +92,6 @@ class Dokan_Invoice {
      * @since 1.0.0
      */
     function is_dependency_available(){
-
         $res = true;
 
         foreach ( $this->depends_on as $class ){
@@ -117,7 +113,6 @@ class Dokan_Invoice {
      * @since 1.0.0
      */
     function dependency_notice(){
-
         $errors = '';
         $error = '';
         foreach ( $this->dependency_error as $error ) {
@@ -128,7 +123,6 @@ class Dokan_Invoice {
         echo $message;
 
         deactivate_plugins( plugin_basename( __FILE__ ) );
-
     }
 
     /**
@@ -156,28 +150,11 @@ class Dokan_Invoice {
         add_action( 'init', array( $this, 'localization_setup' ) );
         // Loads frontend scripts and styles
         //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
-    }
-
-    /**
-     * Placeholder for activation function
-     *
-     * Nothing being called here yet.
-     */
-    public function activate() {
-
-    }
-
-    /**
-     * Placeholder for deactivation function
-     *
-     * Nothing being called here yet.
-     */
-    public function deactivate() {
-
     }
 
     /**
