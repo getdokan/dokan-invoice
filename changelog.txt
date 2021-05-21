@@ -1,4 +1,9 @@
 ====== Changelog ======
+v1.2.1 -> 22 May 2021
+------------------------
+- [new] Added new filter hook: dokan_invoice_single_seller_address
+- [fix] Made some string translatible
+- [update] WordPress latest version compatibility
 
 v1.1.0 -> 9 September 2017
 ------------------------

@@ -94,9 +94,6 @@ module.exports = function(grunt) {
     grunt.registerTask( 'release', [
         'replace',
         'makepot',
-        'clean',
-        'copy',
-        'compress'
     ]);
 
     grunt.registerTask( 'zip', [
