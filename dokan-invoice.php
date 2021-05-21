@@ -276,13 +276,19 @@ class Dokan_Invoice {
                 }
             } else {
                 $vendor_id      = $seller_list[0];
-                $shop_address   = "<br>" . dokan_get_seller_address( $vendor_id );
+	            /**
+	             * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
+	             */
+                $shop_address   = "<br>" . apply_filters( 'dokan_invoice_single_seller_address', dokan_get_seller_address( $vendor_id ), $vendor_id, $order_id );
               }
 
             return $shop_address;
         } else {
             $vendor_id    = dokan_get_seller_id_by_order( $order_id );
-            $shop_address = "<br>" . dokan_get_seller_address( $vendor_id );
+	        /**
+	         * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
+	         */
+            $shop_address = "<br>" . apply_filters( 'dokan_invoice_single_seller_address', dokan_get_seller_address( $vendor_id ), $vendor_id, $order_id );
 
             return $shop_address;
         }

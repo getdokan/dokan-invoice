@@ -1,12 +1,12 @@
 === Dokan Invoice ===
-Contributors: tareq1988, wedevs, rafsuntaskin
-Donate link: http://tareq.wedevs.com/donate/
+Contributors: tareq1988, wedevs, nizamuddinbabu
+Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
 Tested up to: 5.4
 WC requires at least: 3.0
 WC tested up to: 3.7.0
-Stable tag: trunk
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
