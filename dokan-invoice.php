@@ -1,10 +1,9 @@
 <?php
-
 /*
   Plugin Name: Dokan - PDF Invoice
   Plugin URI: https://wedevs.com/
   Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 1.1.0
+  Version: 1.2.0
   Author: weDevs
   Author URI: https://wedevs.com/
   License: GPL2
@@ -67,7 +66,6 @@ class Dokan_Invoice {
      * @uses add_action()
      */
     public function __construct() {
-
         self::$plugin_basename = plugin_basename( __FILE__ );
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
@@ -141,16 +139,11 @@ class Dokan_Invoice {
     }
 
     function init_hooks() {
-
-        if ( !class_exists( 'WooCommerce_PDF_Invoices' ) ) {
+        if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
             return ;
         }
 
-        // Localize our plugin
         add_action( 'init', array( $this, 'localization_setup' ) );
-        // Loads frontend scripts and styles
-        //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
@@ -176,12 +169,7 @@ class Dokan_Invoice {
      * @uses wp_enqueue_style
      */
     public function enqueue_scripts() {
-
-        /**
-         * All styles goes here
-         */
         wp_enqueue_style( 'dokan-invoice-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
-
     }
 
     /**
@@ -214,7 +202,6 @@ class Dokan_Invoice {
      * @return string $shop_name
      */
     function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
-        // get $order_id & $parent_id
         extract( $this->get_order_id_parent_id( $document ) );
 
         // If parent order keep Original Store name else set seller store name
