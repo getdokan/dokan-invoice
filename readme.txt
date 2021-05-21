@@ -3,10 +3,10 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
-Tested up to: 5.4
+Tested up to: 5.7.2
 WC requires at least: 3.0
-WC tested up to: 3.7.0
-Stable tag: 1.2.0
+WC tested up to: 5.3.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,12 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.1 -> 22 May 2021
+------------------------
+- [new] Added new filter hook: dokan_invoice_single_seller_address
+- [fix] Made some string translatible
+- [update] WordPress latest version compatibility
 
 v1.2.0 -> 21 August 2019
 ------------------------
