@@ -1,13 +1,13 @@
 <?php
-/*
-  Plugin Name: Dokan - PDF Invoice
-  Plugin URI: https://wedevs.com/
-  Description: A Dokan plugin Add-on to get PDF invoice.
-  Version: 1.2.0
-  Author: weDevs
-  Author URI: https://wedevs.com/
-  License: GPL2
-  Text Domain: dokan-invoice
+/**
+ * Plugin Name: Dokan - PDF Invoice
+ * Plugin URI: https://wedevs.com/
+ * Description: A Dokan plugin Add-on to get PDF invoice.
+ * Version: 1.2.0
+ * Author: weDevs
+ * Author URI: https://wedevs.com/
+ * License: GPL2
+ * Text Domain: dokan-invoice
  */
 
 /**
@@ -36,7 +36,7 @@
  * **********************************************************************
  */
 // don't call the file directly
-if ( !defined( 'ABSPATH' ) )
+if ( ! defined( 'ABSPATH' ) )
     exit;
 
 /**
@@ -51,7 +51,7 @@ class Dokan_Invoice {
     public static $plugin_basename;
     protected $dokan_invoice_active = 0;
 
-    private $depends_on = array();
+    private $depends_on       = array();
     private $dependency_error = array();
 
     /**
@@ -81,15 +81,15 @@ class Dokan_Invoice {
         );
 
         add_action( 'init', array( $this,'is_dependency_available') );
-
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
 
     /**
      * check if dependencies installed or not and add error notice
+     *
      * @since 1.0.0
      */
-    function is_dependency_available(){
+    public function is_dependency_available(){
         $res = true;
 
         foreach ( $this->depends_on as $class ){
@@ -106,11 +106,12 @@ class Dokan_Invoice {
         return $res;
     }
 
-    /*
+    /**
      * print error notice if dependency not active
+     *
      * @since 1.0.0
      */
-    function dependency_notice(){
+    public function dependency_notice(){
         $errors = '';
         $error = '';
         foreach ( $this->dependency_error as $error ) {
@@ -138,7 +139,12 @@ class Dokan_Invoice {
         return $instance;
     }
 
-    function init_hooks() {
+    /**
+     * Init hooks
+     *
+     * @return void
+     */
+    public function init_hooks() {
         if ( ! class_exists( 'WooCommerce_PDF_Invoices' ) ) {
             return ;
         }
@@ -176,9 +182,14 @@ class Dokan_Invoice {
      * Set Dokan_invoice buttons on My Account page
      *
      * Hooked with WP_invoice filter
+     *
+     * @param array $actions
+     * @param obj   $order
+     *
+     * @return array $actions
      */
-    function dokan_invoice_listing_actions_my_account( $actions, $order ) {
-        $order_id = dokan_get_prop( $order, 'id' );
+    public function dokan_invoice_listing_actions_my_account( $actions, $order ) {
+        $order_id     = dokan_get_prop( $order, 'id' );
         $order_status = dokan_get_prop( $order, 'status' );
         if ( get_post_meta( $order_id, '_wcpdf_invoice_exists', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
             $actions[ 'invoice' ] = array(
@@ -201,7 +212,7 @@ class Dokan_Invoice {
      *
      * @return string $shop_name
      */
-    function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
+    public function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
         extract( $this->get_order_id_parent_id( $document ) );
 
         // If parent order keep Original Store name else set seller store name
@@ -220,7 +231,7 @@ class Dokan_Invoice {
                 $store_name = $vendor->get_shop_name();
                 $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
 
-                return $shop_name . '<br /><br />Vendor: ' . $store_name;
+                return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
             }
         } else {
             $vendor_id  = dokan_get_seller_id_by_order( $order_id );
@@ -228,7 +239,7 @@ class Dokan_Invoice {
             $store_name = $vendor->get_shop_name();
             $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
 
-            return $shop_name . '<br /><br />Vendor: ' . $store_name;
+            return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
         }
     }
 
@@ -243,7 +254,7 @@ class Dokan_Invoice {
      *
      * @return string $shop_address
      */
-    function wpo_wcpdf_add_dokan_shop_details( $shop_address, $document = null ) {
+    public function wpo_wcpdf_add_dokan_shop_details( $shop_address, $document = null ) {
         // get $order_id & $parent_id
         extract( $this->get_order_id_parent_id( $document ) );
 
@@ -282,9 +293,10 @@ class Dokan_Invoice {
      *
      * @param type $allowed
      * @param type $order_ids
+     *
      * @return boolean
      */
-    function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
+    public function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
         // check if user is seller
         if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
 
@@ -324,7 +336,14 @@ class Dokan_Invoice {
         }
     }
 
-    function get_order_id_parent_id( $document = null ) {
+    /**
+     * Get parent order id
+     *
+     * @param type $document
+     *
+     * @return array
+     */
+    public function get_order_id_parent_id( $document = null ) {
         if (empty($document) || empty($document->order)) {
             // PDF Invoice 1.X backwards compatibility
             global $wpo_wcpdf;
