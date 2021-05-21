@@ -1,10 +1,12 @@
 === Dokan Invoice ===
-Contributors: tareq1988, wedevs, rafsuntaskin
-Donate link: http://tareq.wedevs.com/donate/
+Contributors: tareq1988, wedevs, nizamuddinbabu
+Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
-Tested up to: 4.7
-Stable tag: 1.0.3
+Tested up to: 5.7.2
+WC requires at least: 3.0
+WC tested up to: 5.3.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,12 +48,23 @@ You can use any PDF editing software like- *Adobe Acrobat* to edit the generated
 == Screenshots ==
 
 1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets 
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png` 
+the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
+directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
 (or jpg, jpeg, gif).
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.1 -> 22 May 2021
+------------------------
+- [new] Added new filter hook: dokan_invoice_single_seller_address
+- [fix] Made some string translatible
+- [update] WordPress latest version compatibility
+
+v1.2.0 -> 21 August 2019
+------------------------
+- [new] Address for refunds & better 2.0 support (#2)
+- [fix] Vendor info in sub order
 
 v1.1.0 -> 9 September 2017
 ------------------------
