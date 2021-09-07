@@ -186,7 +186,7 @@ class Dokan_Invoice {
      * Hooked with WP_invoice filter
      *
      * @param array $actions
-     * @param obj   $order
+     * @param WC_Order $order
      *
      * @return array $actions
      */
