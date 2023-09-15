@@ -3,13 +3,13 @@
  * Plugin Name: Dokan - PDF Invoice
  * Plugin URI: https://wedevs.com/
  * Description: A Dokan plugin Add-on to get PDF invoice.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: weDevs
  * Author URI: https://wedevs.com/
  * License: GPL2
  * Text Domain: dokan-invoice
  * WC requires at least: 3.0
- * WC tested up to: 5.3.0
+ * WC tested up to: 8.1
  */
 
 /**
@@ -73,13 +73,13 @@ class Dokan_Invoice {
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
 
         $this->depends_on['dokan'] = array(
-            'name' => 'WeDevs_Dokan',
-            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
+            'name'   => 'WeDevs_Dokan',
+            'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
         );
 
         $this->depends_on['woocommerce_pdf_invoices'] = array(
-            'name' => 'WooCommerce_PDF_Invoices',
-            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
+            'name'   => 'WooCommerce_PDF_Invoices',
+            'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sPDF Invoices & Packing Slips for WooCommerce plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
         );
 
         add_action( 'init', array( $this,'is_dependency_available') );
@@ -193,9 +193,10 @@ class Dokan_Invoice {
     public function dokan_invoice_listing_actions_my_account( $actions, $order ) {
         $order_id     = dokan_get_prop( $order, 'id' );
         $order_status = dokan_get_prop( $order, 'status' );
-        if ( get_post_meta( $order_id, '_wcpdf_invoice_exists', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
+		
+        if ( get_post_meta( $order_id, '_wcpdf_invoice_number', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
             $actions[ 'invoice' ] = array(
-                'url'  => wp_nonce_url( admin_url( 'admin-ajax.php?action=generate_wpo_wcpdf&my-account&template_type=invoice&order_ids=' . $order_id ), 'generate_wpo_wcpdf' ),
+                'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) ),
                 'name' => apply_filters( 'dokan_invoice_myaccount_button_text', __( 'Download invoice (PDF)', 'dokan-invoice' ) )
             );
         }
