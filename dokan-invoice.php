@@ -153,8 +153,8 @@ class Dokan_Invoice {
 
         add_action( 'init', array( $this, 'localization_setup' ) );
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
-        add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
-        add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
+        add_filter( 'wpo_wcpdf_shop_name_settings_text', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
+        add_filter( 'wpo_wcpdf_shop_address_settings_text', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
     }
 
