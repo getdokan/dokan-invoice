@@ -3,10 +3,10 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 4.7
-Tested up to: 5.7.2
-WC requires at least: 3.0
-WC tested up to: 5.3.0
-Stable tag: 1.2.1
+Tested up to: 6.3.1
+WC requires at least: 5.0.0
+WC tested up to: 8.1.0
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,11 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.2 -> 16 Sep 2023
+------------------------
+- **Update:** WordPress 6.3.1 compatibility
+- **Update:** Added HPOS (High Performance Order Storage) support
 
 v1.2.1 -> 22 May 2021
 ------------------------
