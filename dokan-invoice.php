@@ -3,13 +3,13 @@
  * Plugin Name: Dokan - PDF Invoice
  * Plugin URI: https://wedevs.com/
  * Description: A Dokan plugin Add-on to get PDF invoice.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: weDevs
  * Author URI: https://wedevs.com/
  * License: GPL2
  * Text Domain: dokan-invoice
- * WC requires at least: 3.0
- * WC tested up to: 5.3.0
+ * WC requires at least: 5.0.0
+ * WC tested up to: 8.1.0
  */
 
 /**
