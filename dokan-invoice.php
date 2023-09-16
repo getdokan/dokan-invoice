@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Dokan - PDF Invoice
- * Plugin URI: https://wedevs.com/
+ * Plugin URI: https://dokan.co/wordpress/
  * Description: A Dokan plugin Add-on to get PDF invoice.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: weDevs
- * Author URI: https://wedevs.com/
+ * Author URI: https://dokan.co/
  * License: GPL2
  * Text Domain: dokan-invoice
- * WC requires at least: 3.0
- * WC tested up to: 5.3.0
+ * WC requires at least: 5.0.0
+ * WC tested up to: 8.1.0
  */
 
 /**
@@ -74,7 +74,7 @@ class Dokan_Invoice {
 
         $this->depends_on['dokan'] = array(
             'name' => 'WeDevs_Dokan',
-            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
+            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
         );
 
         $this->depends_on['woocommerce_pdf_invoices'] = array(
