@@ -230,18 +230,18 @@ class Dokan_Invoice {
 			}
 
 			if ( 1 === count( $seller_list ) ) {
-				$vendor_id       = $seller_list[0];
-				$vendor          = dokan()->vendor->get( $vendor_id );
-				$store_name      = $vendor->get_shop_name();
-				$store_name      = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
-				$dokan_shop_name = $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+				$vendor_id        = $seller_list[0];
+				$vendor           = dokan()->vendor->get( $vendor_id );
+				$store_name       = $vendor->get_shop_name();
+				$store_name       = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+				$dokan_shop_name .= "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
 			}
 		} else {
-			$vendor_id       = dokan_get_seller_id_by_order( $order_id );
-			$vendor          = dokan()->vendor->get( $vendor_id );
-			$store_name      = $vendor->get_shop_name();
-			$store_name      = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
-			$dokan_shop_name = $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+			$vendor_id        = dokan_get_seller_id_by_order( $order_id );
+			$vendor           = dokan()->vendor->get( $vendor_id );
+			$store_name       = $vendor->get_shop_name();
+			$store_name       = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+			$dokan_shop_name .= "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
 		}
 		
 		return apply_filters( 'dokan_invoice_shop_name', $dokan_shop_name, $shop_name, $store_name, $document );
