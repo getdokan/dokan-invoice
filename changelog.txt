@@ -1,4 +1,10 @@
 ====== Changelog ======
+
+v1.2.2 -> 16 Sep 2023
+------------------------
+- **Update:** WordPress 6.3.1 compatibility
+- **Update:** Added HPOS (High Performance Order Storage) support
+
 v1.2.1 -> 22 May 2021
 ------------------------
 - [new] Added new filter hook: dokan_invoice_single_seller_address

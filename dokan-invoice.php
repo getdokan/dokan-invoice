@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Dokan - PDF Invoice
- * Plugin URI: https://wedevs.com/
+ * Plugin URI: https://dokan.co/wordpress/
  * Description: A Dokan plugin Add-on to get PDF invoice.
  * Version: 1.2.2
  * Author: weDevs
- * Author URI: https://wedevs.com/
+ * Author URI: https://dokan.co/
  * License: GPL2
  * Text Domain: dokan-invoice
- * WC requires at least: 3.0
- * WC tested up to: 8.1
+ * WC requires at least: 5.0.0
+ * WC tested up to: 8.1.0
  */
 
 /**
@@ -72,27 +72,41 @@ class Dokan_Invoice {
 		self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
 		self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
 
-		$this->depends_on['dokan'] = array(
-			'name'   => 'WeDevs_Dokan',
-			'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wedevs.com/products/plugins/dokan/">', '</a>' ),
-		);
+        $this->depends_on['dokan'] = array(
+            'name' => 'WeDevs_Dokan',
+            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
+        );
 
 		$this->depends_on['woocommerce_pdf_invoices'] = array(
 			'name'   => 'WooCommerce_PDF_Invoices',
 			'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sPDF Invoices & Packing Slips for WooCommerce plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
 		);
 
-		add_action( 'init', array( $this,'is_dependency_available') );
-		add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
-	}
+	    add_action( 'before_woocommerce_init', [ $this, 'add_hpos_support' ] );
+        add_action( 'init', array( $this,'is_dependency_available') );
+        add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
+    }
 
 	/**
-	 * check if dependencies installed or not and add error notice
+	 * Add High Performance Order Storage Support.
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.2
+	 *
+	 * @return void
 	 */
-	public function is_dependency_available(){
-		$res = true;
+	public function add_hpos_support() {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+
+    /**
+     * check if dependencies installed or not and add error notice
+     *
+     * @since 1.0.0
+     */
+    public function is_dependency_available(){
+        $res = true;
 
 		foreach ( $this->depends_on as $class ){
 			if ( !class_exists( $class['name'] ) ){
@@ -180,29 +194,21 @@ class Dokan_Invoice {
 		wp_enqueue_style( 'dokan-invoice-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
 	}
 
-	/**
-	 * Set Dokan_invoice buttons on My Account page
-	 *
-	 * Hooked with WP_invoice filter
-	 *
-	 * @param array $actions
-	 * @param obj   $order
-	 *
-	 * @return array $actions
-	 */
-	public function dokan_invoice_listing_actions_my_account( $actions, $order ) {
-		$order_id     = dokan_get_prop( $order, 'id' );
-		$order_status = dokan_get_prop( $order, 'status' );
-		
-		if ( get_post_meta( $order_id, '_wcpdf_invoice_number', true ) || in_array( $order_status, apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
-			$actions[ 'invoice' ] = array(
-				'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) ),
-				'name' => apply_filters( 'dokan_invoice_myaccount_button_text', __( 'Download invoice (PDF)', 'dokan-invoice' ) )
-			);
-		}
+    /**
+     * Set Dokan_invoice buttons on My Account page
+     *
+     * Hooked with WP_invoice filter
+     *
+     * @param array $actions
+     * @param WC_Order $order
+     *
+     * @return array $actions
+     */
+    public function dokan_invoice_listing_actions_my_account( $actions, $order ) {
+        $frontend = new \WPO\WC\PDF_Invoices\Frontend();
 
-		return $actions;
-	}
+        return $frontend->my_account_pdf_link( $actions, $order );
+    }
 
 	/**
 	 * Filter Shop name according to Store name
@@ -312,10 +318,10 @@ class Dokan_Invoice {
 
 			if ( count( $order_ids ) == 1 ) {
 
-				$order        = new WC_Order( $order_ids );
-				$items        = $order->get_items();
-				$seller_id    = dokan_get_seller_id_by_order( $order_ids );
-				$current_user = get_current_user_id();
+                $order        = wc_get_order( $order_ids );
+                $items        = $order->get_items();
+                $seller_id    = dokan_get_seller_id_by_order( $order_ids );
+                $current_user = get_current_user_id();
 
 				if ( $current_user == $seller_id ) {
 					return true; // this seller is allowed
@@ -346,28 +352,32 @@ class Dokan_Invoice {
 		}
 	}
 
-	/**
-	 * Get parent order id
-	 *
-	 * @param type $document
-	 *
-	 * @return array
-	 */
-	public function get_order_id_parent_id( $document = null ) {
-		if (empty($document) || empty($document->order)) {
-			// PDF Invoice 1.X backwards compatibility
-			global $wpo_wcpdf;
-			$order     = $wpo_wcpdf->export->order;
-			$order_id  = dokan_get_prop( $order, 'id' );
-			$parent_id = wp_get_post_parent_id( $order_id );
-		} else {
-			if ( $document->is_refund( $document->order ) ) {
-				$order_id = $document->get_refund_parent_id( $document->order );
-			} else {
-				$order_id = $document->order_id;
-			}
-			$parent_id = wp_get_post_parent_id( $order_id );
-		}
+    /**
+     * Get parent order id
+     *
+     * @param type $document
+     *
+     * @return array
+     */
+    public function get_order_id_parent_id( $document = null ) {
+        if (empty($document) || empty($document->order)) {
+            // PDF Invoice 1.X backwards compatibility
+            global $wpo_wcpdf;
+	        /**
+	         * @var $order WC_Order
+	         */
+            $order     = $wpo_wcpdf->export->order;
+            $order_id  = $order->get_id();
+            $parent_id = $order->get_parent_id();
+        } else {
+            if ( $document->is_refund( $document->order ) ) {
+                $order_id = $document->get_refund_parent_id( $document->order );
+            } else {
+                $order_id = $document->order_id;
+            }
+			$order = wc_get_order( $order_id );
+            $parent_id = $order->get_parent_id();
+        }
 
 		return compact('order_id','parent_id');
 	}
