@@ -73,8 +73,8 @@ class Dokan_Invoice {
 		self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
 
         $this->depends_on['dokan'] = array(
-            'name' => 'WeDevs_Dokan',
-            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
+            'name'   => 'WeDevs_Dokan',
+            'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
         );
 
 		$this->depends_on['woocommerce_pdf_invoices'] = array(
@@ -82,7 +82,7 @@ class Dokan_Invoice {
 			'notice' => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sPDF Invoices & Packing Slips for WooCommerce plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
 		);
 
-	    add_action( 'before_woocommerce_init', [ $this, 'add_hpos_support' ] );
+	    add_action( 'before_woocommerce_init', array( $this, 'add_hpos_support' ) );
         add_action( 'init', array( $this,'is_dependency_available') );
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
