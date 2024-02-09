@@ -79,26 +79,26 @@ class Dokan_Invoice {
 
         $this->depends_on['woocommerce_pdf_invoices'] = array(
             'name' => 'WooCommerce_PDF_Invoices',
-            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
+            'notice'     => sprintf( __( '<b>Dokan PDF Invoice </b> requires %sPDF Invoices & Packing Slips for WooCommerce plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
         );
 
-	    add_action( 'before_woocommerce_init', [ $this, 'add_hpos_support' ] );
+        add_action( 'before_woocommerce_init', [ $this, 'add_hpos_support' ] );
         add_action( 'init', array( $this,'is_dependency_available') );
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
 
-	/**
-	 * Add High Performance Order Storage Support.
-	 *
-	 * @since 1.2.2
-	 *
-	 * @return void
-	 */
-	public function add_hpos_support() {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-		}
-	}
+    /**
+     * Add High Performance Order Storage Support.
+     *
+     * @since 1.2.2
+     *
+     * @return void
+     */
+    public function add_hpos_support() {
+        if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+        }
+    }
 
     /**
      * check if dependencies installed or not and add error notice
@@ -167,8 +167,8 @@ class Dokan_Invoice {
 
         add_action( 'init', array( $this, 'localization_setup' ) );
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
-        add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
-        add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
+        add_filter( 'wpo_wcpdf_shop_name_settings_text', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
+        add_filter( 'wpo_wcpdf_shop_address_settings_text', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
     }
 
@@ -224,32 +224,33 @@ class Dokan_Invoice {
     public function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
         extract( $this->get_order_id_parent_id( $document ) );
 
-        // If parent order keep Original Store name else set seller store name
-        if ( $parent_id == 0 ) {
+        $dokan_shop_name = $shop_name;
+        $store_name      = '';
+
+        // if parent order keep Original Store name else set seller store name
+        if ( 0 === $parent_id ) {
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
                 $seller_list = dokan_get_seller_ids_by( $order_id );
             } else {
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
             }
 
-            if ( count( $seller_list ) > 1 ) {
-                return $shop_name;
-            } else {
-                $vendor_id  = $seller_list[0];
-                $vendor     = dokan()->vendor->get( $vendor_id );
-                $store_name = $vendor->get_shop_name();
-                $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
-
-                return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+            if ( 1 === count( $seller_list ) ) {
+                $vendor_id        = $seller_list[0];
+                $vendor           = dokan()->vendor->get( $vendor_id );
+                $store_name       = $vendor->get_shop_name();
+                $store_name       = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+                $dokan_shop_name .= "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
             }
         } else {
-            $vendor_id  = dokan_get_seller_id_by_order( $order_id );
-            $vendor     = dokan()->vendor->get( $vendor_id );
-            $store_name = $vendor->get_shop_name();
-            $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
-
-            return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+            $vendor_id        = dokan_get_seller_id_by_order( $order_id );
+            $vendor           = dokan()->vendor->get( $vendor_id );
+            $store_name       = $vendor->get_shop_name();
+            $store_name       = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+            $dokan_shop_name .= "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
         }
+
+        return apply_filters( 'dokan_invoice_shop_name', $dokan_shop_name, $shop_name, $store_name, $document );
     }
 
     /**
@@ -285,18 +286,18 @@ class Dokan_Invoice {
                 }
             } else {
                 $vendor_id      = $seller_list[0];
-	            /**
-	             * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
-	             */
+                /**
+                 * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
+                 */
                 $shop_address   = "<br>" . apply_filters( 'dokan_invoice_single_seller_address', dokan_get_seller_address( $vendor_id ), $vendor_id, $order_id );
               }
 
             return $shop_address;
         } else {
             $vendor_id    = dokan_get_seller_id_by_order( $order_id );
-	        /**
-	         * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
-	         */
+            /**
+             * @since 1.2.1 added filter hook dokan_invoice_single_seller_address
+             */
             $shop_address = "<br>" . apply_filters( 'dokan_invoice_single_seller_address', dokan_get_seller_address( $vendor_id ), $vendor_id, $order_id );
 
             return $shop_address;
@@ -362,9 +363,9 @@ class Dokan_Invoice {
         if (empty($document) || empty($document->order)) {
             // PDF Invoice 1.X backwards compatibility
             global $wpo_wcpdf;
-	        /**
-	         * @var $order WC_Order
-	         */
+            /**
+             * @var $order WC_Order
+             */
             $order     = $wpo_wcpdf->export->order;
             $order_id  = $order->get_id();
             $parent_id = $order->get_parent_id();
@@ -374,7 +375,7 @@ class Dokan_Invoice {
             } else {
                 $order_id = $document->order_id;
             }
-			$order = wc_get_order( $order_id );
+            $order = wc_get_order( $order_id );
             $parent_id = $order->get_parent_id();
         }
 
