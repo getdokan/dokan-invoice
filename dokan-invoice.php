@@ -57,13 +57,13 @@ class Dokan_Invoice {
     private $depends_on       = array();
     private $dependency_error = array();
 
-	/**
-	 * WC PDF Plugin Class Name.
-	 *
-	 * @since 1.2.3
-	 *
-	 * @var string
-	 */
+    /**
+     * WC PDF Plugin Class Name.
+     *
+     * @since 1.2.3
+     *
+     * @var string
+     */
 	public $wc_pdf_class = '';
 
     /**
