@@ -64,7 +64,7 @@ class Dokan_Invoice {
      *
      * @var string
      */
-	public $wc_pdf_class = '';
+    public $wc_pdf_class = '';
 
     /**
      * Constructor for the Dokan_Invoice class
