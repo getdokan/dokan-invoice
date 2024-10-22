@@ -57,6 +57,15 @@ class Dokan_Invoice {
     private $depends_on       = array();
     private $dependency_error = array();
 
+	/**
+	 * WC PDF Plugin Class Name.
+	 *
+	 * @since 1.2.3
+	 *
+	 * @var string
+	 */
+	public $wc_pdf_class = '';
+
     /**
      * Constructor for the Dokan_Invoice class
      *
@@ -73,13 +82,15 @@ class Dokan_Invoice {
         self::$plugin_url      = plugin_dir_url( self::$plugin_basename );
         self::$plugin_path     = trailingslashit( dirname( __FILE__ ) );
 
+	    $this->wc_pdf_class = version_compare( get_option( 'wpo_wcpdf_version', false ), '3.9.0', '<' ) ? 'WooCommerce_PDF_Invoices' : 'WPO_WCPDF' ;
+
         $this->depends_on['dokan'] = array(
             'name'   => 'WeDevs_Dokan',
             'notice' => sprintf( esc_html__( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
         );
 
         $this->depends_on['woocommerce_pdf_invoices'] = array(
-            'name'   => 'WPO_WCPDF',
+            'name'   => $this->wc_pdf_class,
             'notice' => sprintf( esc_html__( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
         );
 
@@ -162,7 +173,7 @@ class Dokan_Invoice {
      * @return void
      */
     public function init_hooks() {
-        if ( ! class_exists( 'WPO_WCPDF' ) ) {
+        if ( ! class_exists( $this->wc_pdf_class ) ) {
             return ;
         }
 
