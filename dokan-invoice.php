@@ -236,6 +236,8 @@ class Dokan_Invoice {
     public function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
         extract( $this->get_order_id_parent_id( $document ) );
 
+        $shop_name_label = apply_filters( 'dokan_invoice_shop_name_label', esc_html__( 'Vendor', 'dokan-invoice' ), $document );
+
         // If parent order keep Original Store name else set seller store name
         if ( $parent_id == 0 ) {
             if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
@@ -244,24 +246,24 @@ class Dokan_Invoice {
                 $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
             }
 
-            if ( count( $seller_list ) > 1 ) {
-                return $shop_name;
-            } else {
+            if ( 1 === count( $seller_list ) ) {
                 $vendor_id  = $seller_list[0];
                 $vendor     = dokan()->vendor->get( $vendor_id );
                 $store_name = $vendor->get_shop_name();
-                $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+                $store_name = $store_name ?: '';
 
-                return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+                $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
             }
         } else {
             $vendor_id  = dokan_get_seller_id_by_order( $order_id );
             $vendor     = dokan()->vendor->get( $vendor_id );
             $store_name = $vendor->get_shop_name();
-            $store_name = ! empty( $store_name ) ? $store_name : __( 'store_info', 'dokan-invoice' );
+            $store_name = $store_name ?: '';
 
-            return $shop_name . "<br /><br />" . __( 'Vendor:', 'dokan-invoice' ) . $store_name;
+            $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
         }
+
+        return apply_filters( 'dokan_invoice_store_name', $shop_name, $document );
     }
 
     /**
