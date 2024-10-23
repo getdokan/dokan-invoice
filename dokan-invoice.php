@@ -260,7 +260,7 @@ class Dokan_Invoice {
             $store_name = $vendor->get_shop_name();
             $store_name = $store_name ?: '';
 
-	        $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
+            $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
         }
 
         return apply_filters( 'dokan_invoice_store_name', $shop_name, $document );
