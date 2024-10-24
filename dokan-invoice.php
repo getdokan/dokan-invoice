@@ -3,13 +3,13 @@
  * Plugin Name: Dokan - PDF Invoice
  * Plugin URI: https://dokan.co/wordpress/
  * Description: A Dokan plugin Add-on to get PDF invoice.
- * Version: 1.2.2
+ * Version: 1.2.3
  * Author: weDevs
  * Author URI: https://dokan.co/
  * License: GPL2
  * Text Domain: dokan-invoice
- * WC requires at least: 5.0.0
- * WC tested up to: 8.1.0
+ * WC requires at least: 8.0.0
+ * WC tested up to: 9.3.3
  * Requires Plugins: woocommerce, dokan-lite, woocommerce-pdf-invoices-packing-slips
  */
 

@@ -1,5 +1,12 @@
 ====== Changelog ======
 
+v1.2.3 -> 23 Oct 2024
+------------------------
+- **Update:** WordPress v6.6.2 compatibility
+- **Update:** PDF Invoices & Packing Slips for WooCommerce v3.9.0 compatibility
+- **Update:** Rewrite dokan store name adding implementation
+- **Fix:** Dependency error with PDF Invoices for WooCommerce v3.9.0 on plugin activation
+
 v1.2.2 -> 16 Sep 2023
 ------------------------
 - **Update:** WordPress 6.3.1 compatibility

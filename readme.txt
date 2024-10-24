@@ -2,11 +2,11 @@
 Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
-Requires at least: 4.7
-Tested up to: 6.3.1
-WC requires at least: 5.0.0
-WC tested up to: 8.1.0
-Stable tag: 1.2.2
+Requires at least: 6.4
+Tested up to: 6.6.2
+WC requires at least: 8.0.0
+WC tested up to: 9.3.3
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,13 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.3 -> 23 Oct 2024
+------------------------
+- **Update:** WordPress v6.6.2 compatibility
+- **Update:** PDF Invoices & Packing Slips for WooCommerce v3.9.0 compatibility
+- **Update:** Rewrite dokan store name adding implementation
+- **Fix:** Dependency error with PDF Invoices for WooCommerce v3.9.0 on plugin activation
 
 v1.2.2 -> 16 Sep 2023
 ------------------------
