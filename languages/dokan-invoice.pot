@@ -1,48 +1,48 @@
-# Copyright (C) 2023 weDevs
+# Copyright (C) 2024 weDevs
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Dokan - PDF Invoice 1.2.2\n"
+"Project-Id-Version: Dokan - PDF Invoice 1.2.3\n"
 "Report-Msgid-Bugs-To: support@wedevs.com\n"
-"POT-Creation-Date: 2023-09-16 14:52:26+00:00\n"
+"POT-Creation-Date: 2024-10-23 09:43:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
 
-#: dokan-invoice.php:77
+#: dokan-invoice.php:89
 msgid ""
 "<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & "
 "activated!"
 msgstr ""
 
-#: dokan-invoice.php:82
+#: dokan-invoice.php:94
 msgid ""
 "<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing "
 "slips plugin%s to be installed & activated!"
 msgstr ""
 
-#: dokan-invoice.php:241 dokan-invoice.php:249 dokan-invoice.php:283
-msgid "store_info"
+#: dokan-invoice.php:239
+msgid "Vendor"
 msgstr ""
 
-#: dokan-invoice.php:243 dokan-invoice.php:251
-msgid "Vendor:"
-msgstr ""
-
-#: dokan-invoice.php:279
+#: dokan-invoice.php:293
 msgid "From vendors:"
+msgstr ""
+
+#: dokan-invoice.php:297
+msgid "store_info"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
 msgid "Dokan - PDF Invoice"
 msgstr ""
 
-#. Author URI of the plugin/theme
-msgid "https://wedevs.com/"
+#. Plugin URI of the plugin/theme
+msgid "https://dokan.co/wordpress/"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -51,4 +51,8 @@ msgstr ""
 
 #. Author of the plugin/theme
 msgid "weDevs"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://dokan.co/"
 msgstr ""
