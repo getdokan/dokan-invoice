@@ -10,6 +10,7 @@
  * Text Domain: dokan-invoice
  * WC requires at least: 8.0.0
  * WC tested up to: 9.3.3
+ * Requires Plugins: woocommerce, dokan-lite, woocommerce-pdf-invoices-packing-slips
  */
 
 /**
