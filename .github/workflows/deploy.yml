@@ -2,8 +2,8 @@ name: Deploy and Release Plugin to WP.org
 
 on:
     push:
-        tags:
-            - "*"
+        branches:
+            - chore/automate-release-process  # change to your default branch if needed
 jobs:
     releaseToWPOrg:
         name: Release to WordPress.org
@@ -15,6 +15,8 @@ jobs:
               run: |
                 sudo apt-get update
                 sudo apt-get install subversion
+            - name: 🔒 Dry run enabled — skipping deploy to WordPress.org
+              run: echo "Dry run mode: not deploying to WordPress.org"
             - name: WordPress Plugin Deploy
               id: deploy
               uses: 10up/action-wordpress-plugin-deploy@stable
@@ -25,6 +27,7 @@ jobs:
                 SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
                 SLUG: dokan-invoice
             - name: Create GitHub release
+              if: false  # Change to `true` to enable real GitHub release
               uses: softprops/action-gh-release@v2
               with:
                 files: ${{steps.deploy.outputs.zip-path}}
