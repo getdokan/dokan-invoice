@@ -15,8 +15,8 @@ jobs:
               run: |
                 sudo apt-get update
                 sudo apt-get install subversion
-            - name: 🔒 Dry run enabled — skipping deploy to WordPress.org
-              run: echo "Dry run mode: not deploying to WordPress.org"
+            - name: Dry run enabled - skipping deploy to WordPress.org
+              run: echo "Dry run mode not deploying to WordPress.org"
             - name: WordPress Plugin Deploy
               id: deploy
               uses: 10up/action-wordpress-plugin-deploy@stable
