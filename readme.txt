@@ -3,10 +3,10 @@ Contributors: tareq1988, wedevs, nizamuddinbabu
 Donate Link: http://tareq.co/donate/
 Tags: WooCommerce, Multi seller, Multi vendor, Dokan, Invoice, PDF
 Requires at least: 6.4
-Tested up to: 6.6.2
-WC requires at least: 8.0.0
-WC tested up to: 9.3.3
-Stable tag: 1.2.3
+Tested up to: 6.8.1
+WC requires at least: 8.5.0
+WC tested up to: 9.8.4
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.5 -> 19 May 2025
+------------------------
+- **fix:** Fixed minor bugs.
 
 v1.2.4 -> 19 May 2024
 ------------------------
