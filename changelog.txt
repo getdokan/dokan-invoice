@@ -1,5 +1,12 @@
 ====== Changelog ======
 
+v1.2.4 -> 19 May 2025
+------------------------
+- **Update:** Dependency plugin name on admin notice.
+- **Fix:** Resolved an issue where a fatal error occurred in the customer order completion page.
+- **Fix:** Resolved an issue where a warning was displayed saying text-domain was loading incorrectly.
+- **Chore:** Automated release process to WordPress.org.
+
 v1.2.3 -> 23 Oct 2024
 ------------------------
 - **Update:** WordPress v6.6.2 compatibility
