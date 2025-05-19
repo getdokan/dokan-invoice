@@ -120,7 +120,7 @@ class Dokan_Invoice {
 
         $this->depends_on['woocommerce_pdf_invoices'] = array(
             'name'   => $this->wc_pdf_class,
-            'notice' => sprintf( esc_html__( '%sDokan PDF Invoice%s requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<b>', '</b>', '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
+            'notice' => sprintf( esc_html__( '%sDokan PDF Invoice%s requires %sPDF Invoices & packing slips for WooCommerce plugin%s to be installed & activated!' , 'dokan-invoice' ), '<b>', '</b>', '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
         );
 
         foreach ( $this->depends_on as $class ){
