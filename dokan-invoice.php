@@ -3,7 +3,7 @@
  * Plugin Name: Dokan - PDF Invoice
  * Plugin URI: https://dokan.co/wordpress/
  * Description: A Dokan plugin Add-on to get PDF invoice.
- * Version: 1.2.4
+ * Version: 1.2.5
  * Author: weDevs
  * Author URI: https://dokan.co/
  * License: GPL2
