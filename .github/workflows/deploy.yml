@@ -18,6 +18,7 @@ jobs:
             - name: Dry run enabled - skipping deploy to WordPress.org
               run: echo "Dry run mode not deploying to WordPress.org"
             - name: WordPress Plugin Deploy
+              if: false  # <-- disables deploy in dry run mode
               id: deploy
               uses: 10up/action-wordpress-plugin-deploy@stable
               with:
