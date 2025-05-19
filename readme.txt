@@ -55,6 +55,13 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+v1.2.4 -> 19 May 2024
+------------------------
+- **Update:** Dependency plugin name on admin notice.
+- **Fix:** Resolved an issue where a fatal error occurred in the customer order completion page.
+- **Fix:** Resolved an issue where a warning was displayed saying text-domain was loading incorrectly.
+- **Chore:** Automated the release process for WordPress.org.
+
 v1.2.3 -> 23 Oct 2024
 ------------------------
 - **Update:** WordPress v6.6.2 compatibility
