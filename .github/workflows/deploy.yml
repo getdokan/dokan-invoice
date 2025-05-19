@@ -3,7 +3,7 @@ name: Deploy and Release Plugin to WP.org
 on:
     push:
         branches:
-            - chore/automate-release-process  # change to your default branch if needed
+            - chore/automate-release-process  # change to your default branch if needed.
 jobs:
     releaseToWPOrg:
         name: Release to WordPress.org
