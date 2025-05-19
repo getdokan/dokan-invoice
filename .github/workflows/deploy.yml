@@ -22,12 +22,12 @@ jobs:
               uses: 10up/action-wordpress-plugin-deploy@stable
               with:
                 generate-zip: true
+                dry-run: true
               env:
                 SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
                 SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
                 SLUG: dokan-invoice
             - name: Create GitHub release
-              if: false  # Change to `true` to enable real GitHub release
               uses: softprops/action-gh-release@v2
               with:
                 files: ${{steps.deploy.outputs.zip-path}}
