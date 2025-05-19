@@ -84,18 +84,8 @@ class Dokan_Invoice {
 
 	    $this->wc_pdf_class = version_compare( get_option( 'wpo_wcpdf_version', false ), '3.9.0', '<' ) ? 'WooCommerce_PDF_Invoices' : 'WPO_WCPDF' ;
 
-        $this->depends_on['dokan'] = array(
-            'name'   => 'WeDevs_Dokan',
-            'notice' => sprintf( esc_html__( '<b>Dokan PDF Invoice </b> requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
-        );
-
-        $this->depends_on['woocommerce_pdf_invoices'] = array(
-            'name'   => $this->wc_pdf_class,
-            'notice' => sprintf( esc_html__( '<b>Dokan PDF Invoice </b> requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
-        );
-
 	    add_action( 'before_woocommerce_init', [ $this, 'add_hpos_support' ] );
-        add_action( 'init', array( $this,'is_dependency_available') );
+        add_action( 'init', array( $this,'localization_setup_and_is_dependency_available') );
         add_action( 'plugins_loaded', array( $this, 'init_hooks' ) );
     }
 
@@ -113,12 +103,25 @@ class Dokan_Invoice {
 	}
 
     /**
+     * Initialize plugin for localization
      * check if dependencies installed or not and add error notice
      *
      * @since 1.0.0
      */
-    public function is_dependency_available(){
+    public function localization_setup_and_is_dependency_available(){
         $res = true;
+
+        load_plugin_textdomain( 'dokan-invoice', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+        $this->depends_on['dokan'] = array(
+            'name'   => 'WeDevs_Dokan',
+            'notice' => sprintf( esc_html__( '%sDokan PDF Invoice%s requires %sDokan plugin%s to be installed & activated!' , 'dokan-invoice' ), '<b>', '</b>', '<a target="_blank" href="https://dokan.co/wordpress/">', '</a>' ),
+        );
+
+        $this->depends_on['woocommerce_pdf_invoices'] = array(
+            'name'   => $this->wc_pdf_class,
+            'notice' => sprintf( esc_html__( '%sDokan PDF Invoice%s requires %sWooCommerce PDF Invoices & packing slips plugin%s to be installed & activated!' , 'dokan-invoice' ), '<b>', '</b>', '<a target="_blank" href="https://wordpress.org/plugins/woocommerce-pdf-invoices-packing-slips/">', '</a>' ),
+        );
 
         foreach ( $this->depends_on as $class ){
             if ( !class_exists( $class['name'] ) ){
@@ -177,20 +180,10 @@ class Dokan_Invoice {
             return ;
         }
 
-        add_action( 'init', array( $this, 'localization_setup' ) );
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
-    }
-
-    /**
-     * Initialize plugin for localization
-     *
-     * @uses load_plugin_textdomain()
-     */
-    public function localization_setup() {
-        load_plugin_textdomain( 'dokan-invoice', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
     }
 
     /**
