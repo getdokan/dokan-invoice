@@ -2,8 +2,8 @@ name: Deploy and Release Plugin to WP.org
 
 on:
     push:
-        branches:
-            - chore/automate-release-process  # change to your default branch if needed.
+        tags:
+            - "*"
 jobs:
     releaseToWPOrg:
         name: Release to WordPress.org
@@ -15,15 +15,11 @@ jobs:
               run: |
                 sudo apt-get update
                 sudo apt-get install subversion
-            - name: Dry run enabled - skipping deploy to WordPress.org
-              run: echo "Dry run mode not deploying to WordPress.org"
             - name: WordPress Plugin Deploy
-              if: false  # <-- disables deploy in dry run mode
               id: deploy
               uses: 10up/action-wordpress-plugin-deploy@stable
               with:
                 generate-zip: true
-                dry-run: true
               env:
                 SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
                 SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
