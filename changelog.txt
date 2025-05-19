@@ -1,5 +1,9 @@
 ====== Changelog ======
 
+v1.2.5 -> 19 May 2025
+------------------------
+- **fix:** Fixed minor bugs.
+
 v1.2.4 -> 19 May 2025
 ------------------------
 - **Update:** Dependency plugin name on admin notice.
