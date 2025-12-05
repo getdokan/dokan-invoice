@@ -225,7 +225,8 @@ class Dokan_Invoice {
         /**
          * Remove there method my_account_invoice_pdf_link and replace with my_account_invoice_actions;
          * 
-         * @see https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/1149/files#diff-013084d12b13282bd1e87d50f2529347934e978c722e5bbf332b1bfc4dcbdd47L38
+         * @see https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/pull/1149/files
+         * @see https://github.com/wpovernight/woocommerce-pdf-invoices-packing-slips/commit/f6251e2452e502ca837471fbf1de6eb2a6b638d0
          */
 
         if ( method_exists( $frontend, 'my_account_invoice_pdf_link' ) ) {
