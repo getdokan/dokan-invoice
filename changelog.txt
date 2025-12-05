@@ -1,5 +1,9 @@
 ====== Changelog ======
 
+v1.2.6 -> 05 Dec 2025
+----------------------
+- **fix:** Undefined Method my_account_invoice_pdf_link() in Dokan Invoice prevent fatal error
+
 v1.2.5 -> 19 May 2025
 ------------------------
 - **fix:** Fixed minor bugs.
