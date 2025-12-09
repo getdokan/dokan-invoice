@@ -1,5 +1,9 @@
 ====== Changelog ======
 
+v1.2.7 -> 09 Dec 2025
+----------------------
+- **fix:** Ensure compatibility with packing slips by updating method
+
 v1.2.6 -> 05 Dec 2025
 ----------------------
 - **fix:** Undefined Method my_account_invoice_pdf_link() in Dokan Invoice prevent fatal error
