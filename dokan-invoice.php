@@ -205,7 +205,7 @@ class Dokan_Invoice {
      * Hooked with WP_invoice filter
      *
      * @param array    $actions List of actions
-     * @param WC_Order $order   Order object
+     * @param \WC_Order $order   Order object
      *
      * @return array $actions
      */
@@ -217,7 +217,9 @@ class Dokan_Invoice {
 			    return $frontend->my_account_pdf_link( $actions, $order );
 		    }
 
-		    return $frontend->my_account_invoice_pdf_link( $actions, $order );
+		    if ( method_exists( $frontend, 'my_account_invoice_pdf_link' ) ) {
+                return $frontend->my_account_invoice_pdf_link( $actions, $order );
+            }
 	    }
 
 	    $frontend = new \WPO\IPS\Frontend();
