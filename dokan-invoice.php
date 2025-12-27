@@ -184,6 +184,7 @@ class Dokan_Invoice {
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
+		add_filter( 'wpo_wcpdf_woocommerce_totals', [ $this, 'get_woocommerce_totals_on_trail' ], 10, 2 );
     }
 
     /**
@@ -414,6 +415,52 @@ class Dokan_Invoice {
 
         return compact('order_id','parent_id');
     }
+
+	/**
+	 * Modify WooCommerce totals for trial period subscriptions.
+	 *
+	 * @param array    $totals WooCommerce totals
+	 * @param WC_Order $order  Order object
+	 *
+	 * @return array
+	 */
+	public function get_woocommerce_totals_on_trail( $totals, $order ) {
+		if ( $order->get_meta( '_dokan_vendor_subscription_order' ) !== 'yes' ) {
+			return $totals;
+		}
+
+		$vendor_id = $order->get_customer_id();
+		if ( $this->is_trial_period_active( $vendor_id ) ) {
+			$totals['order_total']['value'] = wc_price( 0, array( 'currency' => $order->get_currency() ) );
+		}
+
+		return $totals;
+	}
+
+	/**
+	 * Check if a vendor's subscription trial period is active.
+	 *
+	 * This method retrieves the trial end date and trial status stored in user meta
+	 * and compares the trial end date with the current date and time to determine
+	 * if the trial period is still active.
+	 *
+	 * @param int $user_id The ID of the user (vendor) to check for an active trial period.
+	 *
+	 * @return bool True if the trial period is active, false otherwise.
+	 */
+	public function is_trial_period_active( $user_id ): bool {
+		$trial_until = get_user_meta( $user_id, '_dokan_subscription_trial_until', true );
+		$is_on_trial = get_user_meta( $user_id, '_dokan_subscription_is_on_trial', true );
+
+		if ( $is_on_trial !== 'yes' || empty( $trial_until ) ) {
+			return false;
+		}
+
+		$time = dokan_current_datetime();
+		$time = $time->modify( $trial_until );
+
+		return $time > dokan_current_datetime();
+	}
 
 }
 
