@@ -190,9 +190,7 @@ class Dokan_Invoice {
 
     /**
      * Add invoice action(s) to the Dokan orders REST response.
-     *
-     * Mirrors the legacy My Account action shape:
-     * [ 'invoice' => [ 'url' => ..., 'name' => ... ] ].
+     * @since 1.2.8
      *
      * @param WP_REST_Response $response
      * @param WC_Order         $order
