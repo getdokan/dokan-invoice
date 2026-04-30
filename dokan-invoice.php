@@ -202,15 +202,12 @@ class Dokan_Invoice {
             return $response;
         }
 
-        $document_types = array(
-            'invoice'      => __( 'Invoice', 'dokan-invoice' ),
-            'packing-slip' => __( 'Packing Slip', 'dokan-invoice' ),
-        );
+        $document_types = array( 'invoice', 'packing-slip' );
 
         $data    = $response->get_data();
         $actions = isset( $data['actions'] ) && is_array( $data['actions'] ) ? $data['actions'] : array();
 
-        foreach ( $document_types as $document_type => $default_name ) {
+        foreach ( $document_types as $document_type ) {
             $document = wcpdf_get_document( $document_type, $order );
             if ( ! $document || ! $document->is_enabled() ) {
                 continue;
@@ -222,11 +219,8 @@ class Dokan_Invoice {
                 continue;
             }
 
-            $name = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $default_name;
-
             $actions[ $document_type ] = array(
-                'url'  => $url,
-                'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $document ),
+                'url' => $url,
             );
         }
 
