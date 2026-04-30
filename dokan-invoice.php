@@ -214,7 +214,7 @@ class Dokan_Invoice {
             }
 
             $url = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
-            $url = wp_specialchars_decode( $url, ENT_QUOTES );
+            $url = esc_url_raw( wp_specialchars_decode( $url, ENT_QUOTES ) );
             if ( empty( $url ) ) {
                 continue;
             }

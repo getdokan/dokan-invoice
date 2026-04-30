@@ -6,12 +6,12 @@ wp.hooks.addFilter(
             const order = Array.isArray(items) ? items[0] : items;
             const doc = order && order.actions && order.actions[key];
             if (doc && doc.url) {
-                window.open(doc.url, '_blank');
+                window.open(doc.url, '_blank', 'noopener,noreferrer');
             }
         };
 
         return [
-            ...actions,
+            ...(Array.isArray(actions) ? actions : []),
             {
                 id: 'dokan-invoice-download',
                 label: 'View Invoice',
