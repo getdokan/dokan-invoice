@@ -184,6 +184,58 @@ class Dokan_Invoice {
         add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_filter( 'dokan_rest_prepare_shop_order_object', array( $this, 'add_invoice_url_to_rest_response' ), 10, 2 );
+    }
+
+    /**
+     * Add invoice action(s) to the Dokan orders REST response.
+     *
+     * Mirrors the legacy My Account action shape:
+     * [ 'invoice' => [ 'url' => ..., 'name' => ... ] ].
+     *
+     * @param WP_REST_Response $response
+     * @param WC_Order         $order
+     *
+     * @return WP_REST_Response
+     */
+    public function add_invoice_url_to_rest_response( $response, $order ) {
+        if ( ! is_a( $response, 'WP_REST_Response' ) || ! $order || ! function_exists( 'WPO_WCPDF' ) || ! function_exists( 'wcpdf_get_document' ) ) {
+            return $response;
+        }
+
+        $document_types = array(
+            'invoice'      => __( 'Invoice', 'dokan-invoice' ),
+            'packing-slip' => __( 'Packing Slip', 'dokan-invoice' ),
+        );
+
+        $data    = $response->get_data();
+        $actions = isset( $data['actions'] ) && is_array( $data['actions'] ) ? $data['actions'] : array();
+
+        foreach ( $document_types as $document_type => $default_name ) {
+            $document = wcpdf_get_document( $document_type, $order );
+            if ( ! $document || ! $document->is_enabled() ) {
+                continue;
+            }
+
+            $url = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
+            $url = wp_specialchars_decode( $url, ENT_QUOTES );
+            if ( empty( $url ) ) {
+                continue;
+            }
+
+            $name = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $default_name;
+
+            $actions[ $document_type ] = array(
+                'url'  => $url,
+                'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $document ),
+            );
+        }
+
+        $data['actions'] = $actions;
+        $response->set_data( $data );
+
+        return $response;
     }
 
     /**
@@ -197,6 +249,7 @@ class Dokan_Invoice {
      */
     public function enqueue_scripts() {
         wp_enqueue_style( 'dokan-invoice-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
+        wp_enqueue_script( 'dokan-invoice-orders', plugins_url( 'assets/js/dokan-orders.js', __FILE__ ), array( 'wp-hooks' ), date( 'Ymd' ), false );
     }
 
     /**
