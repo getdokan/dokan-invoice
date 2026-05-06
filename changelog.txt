@@ -1,5 +1,9 @@
 ====== Changelog ======
 
+v1.2.8 -> 06 May 2026
+----------------------
+- **new:** Added invoice and packing slip download actions to vendor dashboard orders.
+
 v1.2.7 -> 09 Dec 2025
 ----------------------
 - **fix:** Ensure compatibility with packing slips by updating method

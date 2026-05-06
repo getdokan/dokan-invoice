@@ -6,7 +6,7 @@ Requires at least: 6.4
 Tested up to: 6.8.1
 WC requires at least: 8.5.0
 WC tested up to: 9.8.4
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.8 -> 06 May 2026
+------------------------
+- **new:** Added invoice and packing slip download actions to vendor dashboard orders.
 
 v1.2.5 -> 19 May 2025
 ------------------------
