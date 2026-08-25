@@ -213,7 +213,9 @@ class Dokan_Invoice {
                 continue;
             }
 
-            $url = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
+            $url = $this->is_base_v6()
+                ? WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $document_type )
+                : WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
             $url = esc_url_raw( wp_specialchars_decode( $url, ENT_QUOTES ) );
             if ( empty( $url ) ) {
                 continue;
@@ -267,7 +269,9 @@ class Dokan_Invoice {
             }
 	    }
 
-	    $frontend = new \WPO\IPS\Frontend();
+        $frontend = $this->is_base_v6()
+            ? WPO_WCPDF()->get_instance( 'frontend' )
+            : WPO_WCPDF()->frontend;
 
         /**
          * Remove there method my_account_invoice_pdf_link and replace with my_account_invoice_actions;
@@ -392,7 +396,7 @@ class Dokan_Invoice {
      */
     public function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
         // check if user is seller
-        if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
+        if ( ! $allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
 
             if ( count( $order_ids ) == 1 ) {
 
@@ -438,7 +442,7 @@ class Dokan_Invoice {
      * @return array
      */
     public function get_order_id_parent_id( $document = null ) {
-        if (empty($document) || empty($document->order)) {
+        if ( empty( $document ) || empty( $document->order ) ) {
             // PDF Invoice 1.X backwards compatibility
             global $wpo_wcpdf;
 	        /**
@@ -451,13 +455,44 @@ class Dokan_Invoice {
             if ( $document->is_refund( $document->order ) ) {
                 $order_id = $document->get_refund_parent_id( $document->order );
             } else {
-                $order_id = $document->order_id;
+                $order_id = $document->order->get_id();
             }
-			$order = wc_get_order( $order_id );
+			$order     = wc_get_order( $order_id );
             $parent_id = $order->get_parent_id();
         }
 
-        return compact('order_id','parent_id');
+        return compact( 'order_id', 'parent_id' );
+    }
+
+    /**
+     * Check whether PDF Invoices is running version 6.0.0 or later.
+     *
+     * @return bool
+     */
+    public function is_base_v6(): bool {
+        static $is_v6 = null;
+
+        if ( null !== $is_v6 ) {
+            return $is_v6;
+        }
+
+        if ( ! function_exists( 'WPO_WCPDF' ) ) {
+            return false;
+        }
+
+        $wpo_ips_base_version = preg_replace(
+            '/[^0-9.].*$/',
+            '',
+            (string) ( WPO_WCPDF()->version ?? '' )
+        );
+
+        if ( empty( $wpo_ips_base_version ) ) {
+            return false;
+        }
+
+        $is_v6 = version_compare( $wpo_ips_base_version, '6.0.0', '>=' );
+
+        return $is_v6;
     }
 
 }
