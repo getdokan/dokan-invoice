@@ -176,8 +176,8 @@ class Dokan_Invoice {
      * @return void
      */
     public function init_hooks() {
-        if ( ! class_exists( $this->wc_pdf_class ) ) {
-            return ;
+        if ( ! class_exists( 'WeDevs_Dokan' ) || ! class_exists( $this->wc_pdf_class ) ) {
+            return;
         }
 
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
