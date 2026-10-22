@@ -219,8 +219,13 @@ class Dokan_Invoice {
                 continue;
             }
 
+            // Same created/printed state the legacy dashboard buttons get from PDF Invoices & Packing Slips.
+            $exists = is_callable( array( $document, 'exists' ) ) && $document->exists();
+
             $actions[ $document_type ] = array(
-                'url' => $url,
+                'url'     => $url,
+                'exists'  => $exists,
+                'printed' => $exists && is_callable( array( $document, 'printed' ) ) && $document->printed(),
             );
         }
 
