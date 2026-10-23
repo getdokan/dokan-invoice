@@ -6,7 +6,7 @@ Requires at least: 6.4
 Tested up to: 6.8.1
 WC requires at least: 8.5.0
 WC tested up to: 9.8.4
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,12 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+v1.2.9 -> 23 Oct 2026
+------------------------
+- **new:** Added compatibility with PDF Invoices & Packing Slips for WooCommerce v6.
+- **fix:** Vendors can now only access PDF documents of their own orders.
+- **update:** Vendor store name is now printed after the shop name on PDF documents. The `dokan_invoice_store_name` filter now receives only the vendor store name markup.
 
 v1.2.8 -> 06 May 2026
 ------------------------
