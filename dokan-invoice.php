@@ -176,14 +176,15 @@ class Dokan_Invoice {
      * @return void
      */
     public function init_hooks() {
-        if ( ! class_exists( $this->wc_pdf_class ) ) {
-            return ;
+        if ( ! class_exists( 'WeDevs_Dokan' ) || ! class_exists( $this->wc_pdf_class ) ) {
+            return;
         }
 
         add_filter( 'dokan_my_account_my_sub_orders_actions', array( $this, 'dokan_invoice_listing_actions_my_account' ), 50, 2 );
-        add_filter( 'wpo_wcpdf_shop_name', array( $this,'wpo_wcpdf_add_dokan_shop_name'), 10, 2 );
+        add_action( 'wpo_wcpdf_after_shop_name', array( $this, 'print_dokan_shop_name' ), 10, 2 );
         add_filter( 'wpo_wcpdf_shop_address', array( $this,'wpo_wcpdf_add_dokan_shop_details'), 10, 2 );
         add_filter( 'wpo_wcpdf_check_privs', array( $this,'wpo_wcpdf_dokan_privs'), 50, 2 );
+        add_filter( 'wpo_wcpdf_current_user_is_allowed', array( $this, 'restrict_vendor_document_permission' ), 50 );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_filter( 'dokan_rest_prepare_shop_order_object', array( $this, 'add_invoice_url_to_rest_response' ), 10, 2 );
     }
@@ -213,7 +214,9 @@ class Dokan_Invoice {
                 continue;
             }
 
-            $url = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
+            $url = $this->is_base_v6()
+                ? WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $document_type )
+                : WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
             $url = esc_url_raw( wp_specialchars_decode( $url, ENT_QUOTES ) );
             if ( empty( $url ) ) {
                 continue;
@@ -267,7 +270,9 @@ class Dokan_Invoice {
             }
 	    }
 
-	    $frontend = new \WPO\IPS\Frontend();
+        $frontend = $this->is_base_v6()
+            ? WPO_WCPDF()->get_instance( 'frontend' )
+            : WPO_WCPDF()->frontend;
 
         /**
          * Remove there method my_account_invoice_pdf_link and replace with my_account_invoice_actions;
@@ -288,47 +293,58 @@ class Dokan_Invoice {
     }
 
     /**
-     * Filter Shop name according to Store name
+     * Print the vendor store name after the shop name.
      *
-     * @since 1.1
+     * @param string             $document_type
+     * @param WC_Abstract_Order  $order
      *
-     * @global type $wpo_wcpdf
-     *
-     * @param type $shop_name
-     *
-     * @return string $shop_name
+     * @return void
      */
-    public function wpo_wcpdf_add_dokan_shop_name( $shop_name, $document = null ) {
-        extract( $this->get_order_id_parent_id( $document ) );
-
-        $shop_name_label = apply_filters( 'dokan_invoice_shop_name_label', esc_html__( 'Vendor', 'dokan-invoice' ), $document );
-
-        // If parent order keep Original Store name else set seller store name
-        if ( $parent_id == 0 ) {
-            if ( function_exists( 'dokan_get_seller_ids_by' ) ) {
-                $seller_list = dokan_get_seller_ids_by( $order_id );
-            } else {
-                $seller_list = array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
-            }
-
-            if ( 1 === count( $seller_list ) ) {
-                $vendor_id  = $seller_list[0];
-                $vendor     = dokan()->vendor->get( $vendor_id );
-                $store_name = $vendor->get_shop_name();
-                $store_name = $store_name ?: '';
-
-                $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
-            }
-        } else {
-            $vendor_id  = dokan_get_seller_id_by_order( $order_id );
-            $vendor     = dokan()->vendor->get( $vendor_id );
-            $store_name = $vendor->get_shop_name();
-            $store_name = $store_name ?: '';
-
-            $shop_name .= sprintf( '<br/><br/>%s: %s',  $shop_name_label,  $store_name );
+    public function print_dokan_shop_name( $document_type, $order ) {
+        if ( ! $order instanceof WC_Abstract_Order ) {
+            return;
         }
 
-        return apply_filters( 'dokan_invoice_store_name', $shop_name, $document );
+        if ( $order instanceof WC_Order_Refund ) {
+            $order = wc_get_order( $order->get_parent_id() );
+
+            if ( ! $order ) {
+                return;
+            }
+        }
+
+        $order_id = $order->get_id();
+
+        // Parent order: only show the vendor when there is a single one.
+        if ( 0 === (int) $order->get_parent_id() ) {
+            $seller_list = function_exists( 'dokan_get_seller_ids_by' )
+                ? dokan_get_seller_ids_by( $order_id )
+                : array_unique( array_keys( dokan_get_sellers_by( $order_id ) ) );
+
+            if ( 1 !== count( $seller_list ) ) {
+                return;
+            }
+
+            $vendor_id = reset( $seller_list );
+        } else {
+            $vendor_id = dokan_get_seller_id_by_order( $order_id );
+        }
+
+        $vendor     = dokan()->vendor->get( $vendor_id );
+        $store_name = $vendor ? $vendor->get_shop_name() : '';
+
+        if ( empty( $store_name ) ) {
+            return;
+        }
+
+        $document = wcpdf_get_document( $document_type, $order );
+        $label    = apply_filters( 'dokan_invoice_shop_name_label', esc_html__( 'Vendor', 'dokan-invoice' ), $document );
+
+        printf(
+            '<div class="dokan-vendor-name">%s: %s</div>',
+            esc_html( $label ),
+            esc_html( $store_name )
+        );
     }
 
     /**
@@ -383,51 +399,46 @@ class Dokan_Invoice {
     }
 
     /**
-     * Set seller permission true if oreder consists his item
+     * Allow vendors to access documents of their own orders.
      *
-     * @param type $allowed
-     * @param type $order_ids
+     * @param bool  $allowed
+     * @param array $order_ids
      *
-     * @return boolean
+     * @return bool
      */
     public function wpo_wcpdf_dokan_privs( $allowed, $order_ids ) {
-        // check if user is seller
-        if ( !$allowed && in_array( 'seller', $GLOBALS['current_user']->roles ) ) {
-
-            if ( count( $order_ids ) == 1 ) {
-
-                $order        = wc_get_order( $order_ids );
-                $items        = $order->get_items();
-                $seller_id    = dokan_get_seller_id_by_order( $order_ids );
-                $current_user = get_current_user_id();
-
-                if ( $current_user == $seller_id ) {
-                    return true; // this seller is allowed
-                } else {
-                    return false;
-                }
-            }
-
-            foreach ( $order_ids as $order_id ) {
-                // get seller_id
-                $seller_id     = dokan_get_seller_id_by_order( $order_id );
-                // loop through items to get list of sellers for this order
-                $order_sellers = array();
-                $order         = new WC_Order( $order_id );
-                $items         = $order->get_items();
-                foreach ( $items as $item ) {
-                    $item_seller = get_post_field( 'post_author', $item['product_id'] );
-                    // check if item is from this seller
-                    if ( $item_seller != $seller_id ) {
-                        return true; // not allowed!
-                    }
-                }
-            }
-            // if we got here, that means the user is a seller and all orders and items belong to this seller
-            return true; // allowed!
-        } else {
-            return $allowed; // preserve original check result
+        if ( $allowed || ! is_user_logged_in() || empty( $order_ids ) || ! is_array( $order_ids ) || ! function_exists( 'dokan_is_seller_has_order' ) ) {
+            return $allowed;
         }
+
+        if ( ! current_user_can( 'dokan_view_order' ) || ! $this->request_has_valid_access_key( $order_ids ) ) {
+            return $allowed;
+        }
+
+        $vendor_id = dokan_get_current_user_id();
+
+        foreach ( $order_ids as $order_id ) {
+            if ( ! dokan_is_seller_has_order( $vendor_id, absint( $order_id ) ) ) {
+                return $allowed;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Vendors must not inherit full document permission from edit_shop_orders.
+     *
+     * @param bool $allowed
+     *
+     * @return bool
+     */
+    public function restrict_vendor_document_permission( $allowed ) {
+        if ( $allowed && current_user_can( 'dokandar' ) && ! current_user_can( 'manage_woocommerce' ) ) {
+            return false;
+        }
+
+        return $allowed;
     }
 
     /**
@@ -438,7 +449,7 @@ class Dokan_Invoice {
      * @return array
      */
     public function get_order_id_parent_id( $document = null ) {
-        if (empty($document) || empty($document->order)) {
+        if ( empty( $document ) || empty( $document->order ) ) {
             // PDF Invoice 1.X backwards compatibility
             global $wpo_wcpdf;
 	        /**
@@ -451,13 +462,87 @@ class Dokan_Invoice {
             if ( $document->is_refund( $document->order ) ) {
                 $order_id = $document->get_refund_parent_id( $document->order );
             } else {
-                $order_id = $document->order_id;
+                $order_id = $document->order->get_id();
             }
-			$order = wc_get_order( $order_id );
+			$order     = wc_get_order( $order_id );
             $parent_id = $order->get_parent_id();
         }
 
-        return compact('order_id','parent_id');
+        return compact( 'order_id', 'parent_id' );
+    }
+
+    /**
+     * Check whether PDF Invoices is running version 6.0.0 or later.
+     *
+     * @return bool
+     */
+    public function is_base_v6(): bool {
+        static $is_v6 = null;
+
+        if ( null !== $is_v6 ) {
+            return $is_v6;
+        }
+
+        if ( ! function_exists( 'WPO_WCPDF' ) ) {
+            return false;
+        }
+
+        $wpo_ips_base_version = preg_replace(
+            '/[^0-9.].*$/',
+            '',
+            (string) ( WPO_WCPDF()->version ?? '' )
+        );
+
+        if ( empty( $wpo_ips_base_version ) ) {
+            return false;
+        }
+
+        $is_v6 = version_compare( $wpo_ips_base_version, '6.0.0', '>=' );
+
+        return $is_v6;
+    }
+
+    /**
+     * Whether the document request carries a valid nonce, or the order key of its single order.
+     *
+     * @param array $order_ids
+     *
+     * @return bool
+     */
+    protected function request_has_valid_access_key( array $order_ids ) {
+        $access_key = '';
+
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        foreach ( array( 'access_key', '_wpnonce', 'order_key' ) as $key ) {
+            if ( ! empty( $_REQUEST[ $key ] ) && is_string( $_REQUEST[ $key ] ) ) {
+                $access_key = sanitize_text_field( wp_unslash( $_REQUEST[ $key ] ) );
+                break;
+            }
+        }
+
+        $action = isset( $_REQUEST['action'] ) && is_string( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+        // phpcs:enable
+
+        if ( '' === $access_key ) {
+            return false;
+        }
+
+        if ( '' !== $action && wp_verify_nonce( $access_key, $action ) ) {
+            return true;
+        }
+
+        // Full access type: a single order link carries that order's key.
+        if ( 1 === count( $order_ids ) ) {
+            $order = wc_get_order( absint( reset( $order_ids ) ) );
+
+            if ( $order instanceof WC_Order_Refund ) {
+                $order = wc_get_order( $order->get_parent_id() );
+            }
+
+            return $order instanceof WC_Order && hash_equals( $order->get_order_key(), $access_key );
+        }
+
+        return false;
     }
 
 }
