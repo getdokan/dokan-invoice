@@ -340,11 +340,21 @@ class Dokan_Invoice {
         $document = wcpdf_get_document( $document_type, $order );
         $label    = apply_filters( 'dokan_invoice_shop_name_label', esc_html__( 'Vendor', 'dokan-invoice' ), $document );
 
-        printf(
+        $vendor_name_html = sprintf(
             '<div class="dokan-vendor-name">%s: %s</div>',
             esc_html( $label ),
             esc_html( $store_name )
         );
+
+        /**
+         * Filter the vendor store name markup printed after the shop name.
+         *
+         * @since 1.2.9 receives only the vendor store name markup instead of the full shop name.
+         *
+         * @param string                                $vendor_name_html
+         * @param \WPO\IPS\Documents\OrderDocument|false $document
+         */
+        echo wp_kses_post( apply_filters( 'dokan_invoice_store_name', $vendor_name_html, $document ) );
     }
 
     /**
