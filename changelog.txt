@@ -5,6 +5,7 @@ v1.2.9 -> 23 Oct 2026
 - **new:** Added compatibility with PDF Invoices & Packing Slips for WooCommerce v6.
 - **fix:** Vendors can now only access PDF documents of their own orders.
 - **update:** Vendor store name is now printed after the shop name on PDF documents. The `dokan_invoice_store_name` filter now receives only the vendor store name markup.
+- **fix:** The invoice and packing slip actions in the new vendor dashboard orders list now show whether the document has been created or printed.
 
 v1.2.8 -> 06 May 2026
 ----------------------
